@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Answers from './Answers';
 import './MainPic.css';
 
 class MainPic extends Component {
@@ -11,11 +12,12 @@ class MainPic extends Component {
 			mainPicCaption : '',
                         flaskMessage : '',
                         error: null,
-                        imageId: 'what',
+                        imageId: null,
                         selectedFile: null,
                         showFileUpload: true,
                         showCaption: false,
-		}
+                        imageId: null,
+                }
 	}
 
   showModal = () => {
@@ -100,13 +102,15 @@ class MainPic extends Component {
              flaskMessage : data.message,
              imageId : data.image_id,
            })
+           console.log("here imageid is ", this.state.imageId);
+           console.log("here mpp is ", this.state.mainPicPath);
          })
          .catch(error => {
            this.setState({ error, isLoading: false});
            console.log("error: ", error);
            })
   }
-	
+
   componentDidMount() {
     this.fetchData();
   }
@@ -134,7 +138,6 @@ class MainPic extends Component {
     }
   }
 			
-         // <UploadPic DATA_URI={this.props.DATA_URI}/>
   render() {
 	return(
 		<div>
@@ -143,7 +146,7 @@ class MainPic extends Component {
 		{ this.state.mainPicCaption }
         <br />
          <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId}/>
-              hi { this.state.imageId } one
+          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} /> }
          <Modal show={this.state.show} handleClose={this.hideModal} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload}>
                   {this.renderFileUpload()}
                   {this.renderCaption()}
@@ -224,7 +227,6 @@ class AddComment extends Component {
     return(
       <div>
       {this.renderWarning()}
-      What the fuck is that?<br />
       <input type="text" onChange={this.handleChange}/>
       <button onClick={this.handleSubmit}>Make Comment</button>
       </div>
