@@ -17,7 +17,9 @@ class MainPic extends Component {
                         showFileUpload: true,
                         showCaption: false,
                         imageId: null,
+                        trigger: 0,
                 }
+            //    this.triggerAnswers = this.triggerAnswers.bind(this);
 	}
 
   showModal = () => {
@@ -137,6 +139,18 @@ class MainPic extends Component {
       );
     }
   }
+
+  triggerAnswers = (trigger) => {
+    this.setState( { trigger : 1 } );
+    console.log("state trigger is ", this.state.trigger);
+  }
+			
+  unTriggerAnswers = (trigger) => {
+    if (this.state.trigger === 1) {
+      this.setState( { trigger : 0 } );
+    }
+    console.log("state trigger un is ", this.state.trigger);
+  }
 			
   render() {
 	return(
@@ -145,8 +159,8 @@ class MainPic extends Component {
 		<br />
 		{ this.state.mainPicCaption }
         <br />
-         <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId}/>
-          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} /> }
+         <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId} triggerAnswers={this.triggerAnswers}/>
+          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} /> }
          <Modal show={this.state.show} handleClose={this.hideModal} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload}>
                   {this.renderFileUpload()}
                   {this.renderCaption()}
@@ -192,6 +206,7 @@ class AddComment extends Component {
   }
 
   handleSubmit = () => {
+    this.props.triggerAnswers(1);
     const fd = new FormData();
     fd.append('comment', this.state.comment);
     fd.append('imageId', this.props.imageId);
