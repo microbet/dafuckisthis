@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import Answers from './Answers';
 import './MainPic.css';
 
+// TODO: make it so it rerenders the main pic
+// when you upload a new pic and lands you on that
+// pic
+
 class MainPic extends Component {
 	constructor(){
 		super();
@@ -104,8 +108,6 @@ class MainPic extends Component {
              flaskMessage : data.message,
              imageId : data.image_id,
            })
-           console.log("here imageid is ", this.state.imageId);
-           console.log("here mpp is ", this.state.mainPicPath);
          })
          .catch(error => {
            this.setState({ error, isLoading: false});
@@ -121,7 +123,7 @@ class MainPic extends Component {
     if (this.state.showFileUpload) {
       return (
         <div>
-        Upload new pic<br />
+        <font color='white'>Upload new pic</font><br />
       <input type="file" onChange={this.handleFileChange}/>
       <button onClick={this.handleUpload}>Upload</button>
         </div>
@@ -142,14 +144,12 @@ class MainPic extends Component {
 
   triggerAnswers = (trigger) => {
     this.setState( { trigger : 1 } );
-    console.log("state trigger is ", this.state.trigger);
   }
 			
   unTriggerAnswers = (trigger) => {
     if (this.state.trigger === 1) {
       this.setState( { trigger : 0 } );
     }
-    console.log("state trigger un is ", this.state.trigger);
   }
 			
   render() {
@@ -160,15 +160,13 @@ class MainPic extends Component {
 		{ this.state.mainPicCaption }
         <br />
          <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId} triggerAnswers={this.triggerAnswers}/>
-          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} /> }
+          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} /> }
          <Modal show={this.state.show} handleClose={this.hideModal} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload}>
                   {this.renderFileUpload()}
                   {this.renderCaption()}
-                  <p>Modal</p>
-                  <p>Datapi</p>
           </Modal>
            <button type="button" onClick={this.showModal}>
-          open
+         Upload 
          </button>
 	</div>
 	);
@@ -178,7 +176,6 @@ class MainPic extends Component {
 const Modal = ({ handleClose, handleFileChange, handleUpload, show, children }) => {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
-  // console.log("children are ", children);
   return(
     <div className={showHideClassName}>
     <section className="modal-main">
@@ -206,7 +203,7 @@ class AddComment extends Component {
   }
 
   handleSubmit = () => {
-    this.props.triggerAnswers(1);
+    //this.props.triggerAnswers(1);
     const fd = new FormData();
     fd.append('comment', this.state.comment);
     fd.append('imageId', this.props.imageId);
@@ -218,7 +215,9 @@ class AddComment extends Component {
       body: fd
     })
     .then((response) => response.json())
-    .then((data) => { console.log(data); })
+    .then((data) => { 
+      this.props.triggerAnswers(1);
+    })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
     });
