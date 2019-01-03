@@ -7,8 +7,8 @@ import './MainPic.css';
 // pic
 
 class MainPic extends Component {
-	constructor(){
-		super();
+	constructor(props){
+		super(props);
 		this.state = {
                         show: false,
                         isLoading: true,
@@ -20,8 +20,12 @@ class MainPic extends Component {
                         selectedFile: null,
                         showFileUpload: true,
                         showCaption: false,
+                        capButton: 'Submit Caption',
+                        showPreview: false,
                         imageId: null,
+                        imagePath: null,
                         trigger: 0,
+                        selectedImage: this.props.selectedImage,
                 }
             //    this.triggerAnswers = this.triggerAnswers.bind(this);
 	}
@@ -32,7 +36,14 @@ class MainPic extends Component {
   
   hideModal = () => {
     this.setState({ show: false });
+    this.fetchdata(this.state.selectedImage);
   }
+  // i left off here trying to get hideModal to 
+  // call fetchdata to load the right image after a file
+  // is uploaded and the modal is closed
+  // but I think the problem is with calling this function
+  // from inside modal and this, but I've done something else like
+  // it before
 
   handleFileChange = event => {
     this.setState( { selectedFile: event.target.files[0] } );
@@ -68,7 +79,9 @@ class MainPic extends Component {
       this.setState( { 
         showFileUpload : false,
         showCaption : true,
-        imageId : data.message,
+        showPreview: true,
+        imageId : data.image_id,
+        imagePath : data.imagePath,
       } );
     })
     .catch((error) => { 
@@ -91,15 +104,15 @@ class MainPic extends Component {
     .then((response) => response.json())
     .then((data) => {
       this.setState( { showFileUpload : false } );
-      this.setState( { showCaption : false } );
+      this.setState( { capButton : 'Edit Caption' });
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem adding the caption' } );
     });
   }
 
-  fetchData() {
-		 fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.props.selectedImage)
+  fetchData = () => {
+		 fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.state.selectedImage)
 			.then(response => response.json())
          .then(data =>  {
            this.setState( { 
@@ -136,7 +149,17 @@ class MainPic extends Component {
       return (
         <div>
       <input type="text" onChange={this.handleTextChange}/>
-      <button onClick={this.handleCaption}>Submit</button>
+      <button onClick={this.handleCaption}>{this.state.capButton}</button>
+        </div>
+      );
+    }
+  }
+
+  previewPic() {
+    if (this.state.showPreview) {
+      return (
+        <div>
+        <img src={this.props.DATA_URI + this.state.imagePath} />
         </div>
       );
     }
@@ -161,9 +184,10 @@ class MainPic extends Component {
         <br />
          <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId} triggerAnswers={this.triggerAnswers}/>
           { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} /> }
-         <Modal show={this.state.show} handleClose={this.hideModal} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload}>
+         <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload}>
                   {this.renderFileUpload()}
                   {this.renderCaption()}
+                  {this.previewPic()}
           </Modal>
            <button type="button" onClick={this.showModal}>
          Upload 
@@ -173,9 +197,13 @@ class MainPic extends Component {
     }
 }
 
-const Modal = ({ handleClose, handleFileChange, handleUpload, show, children }) => {
+const Modal = ({ handleClose, fetchdata, handleFileChange, handleUpload, show, children }) => {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
+  //TODO when you hit close and come back you shouldn't see 
+  //same image and caption - but I don't want to just clear
+  //imageId because I want to then see the image
+  //maybe display the image and then clear it?
   return(
     <div className={showHideClassName}>
     <section className="modal-main">
