@@ -13,7 +13,7 @@ class Answers extends Component {
     this.fetchData();
     this.timer = setInterval(() => {
         this.props.triggerAnswers();
-      }, 5000);
+      }, 50000);
   }
 
   componentWillUnmount() {
@@ -46,12 +46,13 @@ class Answers extends Component {
   render() {
     let display = [];
     if (Array.isArray(this.state.commentBatch)) {
-      this.state.commentBatch.map((element, index) => {
-        display.push(<ul>{element}</ul>);
-      });
-
-        }
-	return(
+      if (this.state.commentBatch.length > 0) {
+        this.state.commentBatch.map((element, index) => {
+         display.push(<ul>{element}</ul>);
+        });
+      }
+    }
+    return(
           <div>
           {display}
         {(this.props.trigger) ? this.fetchData() : this.props.unTriggerAnswers() }

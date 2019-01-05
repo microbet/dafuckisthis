@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import Answers from './Answers';
 import './MainPic.css';
 
-// TODO: make it so it rerenders the main pic
-// when you upload a new pic and lands you on that
-// pic
-
 class MainPic extends Component {
 	constructor(props){
 		super(props);
@@ -27,7 +23,6 @@ class MainPic extends Component {
                         trigger: 0,
                         selectedImage: this.props.selectedImage,
                 }
-            //    this.triggerAnswers = this.triggerAnswers.bind(this);
 	}
 
   showModal = () => {
@@ -36,14 +31,8 @@ class MainPic extends Component {
   
   hideModal = () => {
     this.setState({ show: false });
-    this.fetchdata(this.state.selectedImage);
+    this.fetchData();
   }
-  // i left off here trying to get hideModal to 
-  // call fetchdata to load the right image after a file
-  // is uploaded and the modal is closed
-  // but I think the problem is with calling this function
-  // from inside modal and this, but I've done something else like
-  // it before
 
   handleFileChange = event => {
     this.setState( { selectedFile: event.target.files[0] } );
@@ -83,6 +72,7 @@ class MainPic extends Component {
         imageId : data.image_id,
         imagePath : data.imagePath,
       } );
+      console.log("and here imageId is ", data.image_id);
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
@@ -111,9 +101,11 @@ class MainPic extends Component {
     });
   }
 
-  fetchData = () => {
-		 fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.state.selectedImage)
-			.then(response => response.json())
+  fetchData(msg='') {
+    console.log("msg = ", msg);
+    console.log("sel image = ", this.state.selectedImage);
+    fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.state.selectedImage)
+	.then(response => response.json())
          .then(data =>  {
            this.setState( { 
              mainPicPath : data.imagePath,
@@ -121,6 +113,7 @@ class MainPic extends Component {
              flaskMessage : data.message,
              imageId : data.image_id,
            })
+           console.log("here imageId is ", data.image_id);
          })
          .catch(error => {
            this.setState({ error, isLoading: false});
@@ -174,7 +167,7 @@ class MainPic extends Component {
       this.setState( { trigger : 0 } );
     }
   }
-			
+
   render() {
 	return(
 		<div>
@@ -184,7 +177,7 @@ class MainPic extends Component {
         <br />
          <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId} triggerAnswers={this.triggerAnswers}/>
           { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} /> }
-         <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload}>
+         <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
                   {this.renderCaption()}
                   {this.previewPic()}
@@ -200,10 +193,6 @@ class MainPic extends Component {
 const Modal = ({ handleClose, fetchdata, handleFileChange, handleUpload, show, children }) => {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
-  //TODO when you hit close and come back you shouldn't see 
-  //same image and caption - but I don't want to just clear
-  //imageId because I want to then see the image
-  //maybe display the image and then clear it?
   return(
     <div className={showHideClassName}>
     <section className="modal-main">
@@ -231,7 +220,6 @@ class AddComment extends Component {
   }
 
   handleSubmit = () => {
-    //this.props.triggerAnswers(1);
     const fd = new FormData();
     fd.append('comment', this.state.comment);
     fd.append('imageId', this.props.imageId);
