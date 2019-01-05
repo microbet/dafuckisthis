@@ -253,9 +253,17 @@ class AddComment extends Component {
     }
   }
 
+  scrollToMyRef = () => {
+    window.scrollTo({
+      top:this.myRef.current.OffsetTop,
+      behavior: "smooth"
+    });
+    console.log("do i get here");
+  }
+
   render() {
     return(
-      <div>
+      <div ref={this.myRef}>
       {this.renderWarning()}
       <input type="text" onChange={this.handleChange}/>
       <button onClick={this.handleSubmit}>Make Comment</button>

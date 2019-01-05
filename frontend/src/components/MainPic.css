@@ -25,3 +25,8 @@
   display: none;
 }
 
+.answerBox {
+  height: 300px;
+  width: 300px;
+  overflow: auto;
+}
