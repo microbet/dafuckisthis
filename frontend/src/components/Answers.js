@@ -108,18 +108,45 @@ class Answers extends Component {
       })
       console.log("up down here oldestaid = ", this.state.oldestAnswerId);
   }
+  
+  // dunno if this should be a separate function from fetchData or not, maybe combine later
+  fetchNextAnswer(answerId, imageId) {
+    fetch( this.props.DATA_URI + "/get_next_answer?imageId=" + imageId + "&answerId=" + answerId)
+      .then(response => response.json())
+      .then(data =>  {
+		  console.log("data returned from fetchNextAnswer is ", data);
+		  console.log("commentBatch is ", this.state.commentBatch)
+		  if (data.response != 'oldest') {
+			let tempArr = this.state.commentBatch;
+			tempArr.push(data[0]['answer']);
+			tempArr.shift();
+			this.setState( { commentBatch : tempArr } );
+			this.setState( { oldestAnswerId : data[0]['answerId'] } );
+		  }
+	  })
+	  .catch(error => {
+      this.setState({ error, isLoading: false});
+        console.log("error: ", error);
+      })
+  }
 
   handleScroll = (event) => {
      if (ReactDOM.findDOMNode(this).scrollHeight - ReactDOM.findDOMNode(this).offsetHeight - 1 < ReactDOM.findDOMNode(this).scrollTop) {
        if (this.state.activeScrollListener) {
          console.log("down here oldestaid is ", this.state.oldestAnswerId);
        //  this.props.triggerAnswers();
-        this.fetchData(this.state.oldestAnswerId);
-       }
+       // this.fetchData(this.state.oldestAnswerId);
+		this.fetchNextAnswer(this.state.oldestAnswerId, this.props.imageId);
+	   }
      //  this.setState({ activeScrollListener : false });
 	//   this.props.triggerAnswers();
      }
   }
+  
+  // ok, if the scroll event happens I want it to keep fetching the next answer like once a second
+  // and then stop if you scroll away
+  // if you have kept it there scrolling down for more than like 5 seconds it should fetch answer
+  // like 5 times a second, I definitely need to generalize this behavior for scrolling back up
 
   render() {
     let display = [];
