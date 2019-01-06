@@ -7,7 +7,6 @@ class Answers extends Component {
     super(props);
 	this.state = {
           commentBatch : '',
-          localTrigger : this.props.trigger,
           oldestAnswerId : 0,
           activeScrollListener : true,
         }
@@ -35,6 +34,7 @@ class Answers extends Component {
     this.props.unTriggerAnswers();
     let retArr = [];
     let thisOldAnswerId = 0;
+    console.log("up here oldestaid = ", this.state.oldestAnswerId);
     fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + this.state.oldestAnswerId)
     // I need to send the answer_id, but in python I can default if 
     // there is none to just getting the most recent
@@ -62,34 +62,54 @@ class Answers extends Component {
 		   
            //when new picture comes after closing modal
            //get new answers
+           //
+           //
+           //I'm not going to want this to do 10 at a time 
+           //anyway.  I think when I scroll to the bottom
+           //i have to start another timer and get one more
+           //every second or so that I'm still down there
+           //moving the scroll back up will turn off that 
+           //timer.
          });
-		 retArr = retArr.sort(function(a, b) {
-			 return b[1] - a[1];
-		 });
-		 //console.log("down here retArr is ", retArr);
-		 let retAnsArr = [];
-		 retArr.forEach(function(element) {
-			 retAnsArr.push(element[0]);
-		 });
+	 retArr = retArr.sort(function(a, b) {
+	   return b[1] - a[1];
+	 });
+	 //console.log("down here retArr is ", retArr);
+	 let retAnsArr = [];
+	 retArr.forEach(function(element) {
+	   retAnsArr.push(element[0]);
+	 });
          this.setState( { commentBatch : retAnsArr } )
-         if (update === 1) { this.setState({ oldestAnswerId : thisOldAnswerId })}
-		 console.log("there");
-	//	 this.props.triggerAnswers();
+         console.log("toai ", thisOldAnswerId);
+         if (update === 1) { 
+           console.log("I should get here if it comes from scrolling");
+           this.setState({ oldestAnswerId : thisOldAnswerId })
+       //    this.props.triggerAnswers();
+         }
+	 console.log("there");
+	 console.log("there", this.state.oldestAnswerId);
+	// this.props.triggerAnswers();
+        console.log(this.state.commentBatch);
 	//	 this.props.unTriggerAnswers();
+      })
+      .then( () => {
+        console.log("hi I am in the future");
+        this.props.triggerAnswers();
       })
       .catch(error => {
       this.setState({ error, isLoading: false});
         console.log("error: ", error);
       })
+      console.log("down here oldestaid = ", this.state.oldestAnswerId);
   }
 
   handleScroll = (event) => {
-     if (ReactDOM.findDOMNode(this).scrollHeight - ReactDOM.findDOMNode(this).offsetHeight - 10 < ReactDOM.findDOMNode(this).scrollTop) {
+     if (ReactDOM.findDOMNode(this).scrollHeight - ReactDOM.findDOMNode(this).offsetHeight - 1 < ReactDOM.findDOMNode(this).scrollTop) {
        if (this.state.activeScrollListener) {
         this.fetchData(1);
        }
-       this.setState({ activeScrollListener : false });
-	   this.props.triggerAnswers();
+     //  this.setState({ activeScrollListener : false });
+	//   this.props.triggerAnswers();
      }
   }
 
@@ -105,7 +125,7 @@ class Answers extends Component {
     return(
           <div className="answerBox">
           {display}
-        {(this.props.trigger) ? this.fetchData(0) : this.props.unTriggerAnswers() }
+        {(this.props.trigger)}
           </div>
 	);
     }
