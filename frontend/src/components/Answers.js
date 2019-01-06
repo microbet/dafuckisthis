@@ -22,24 +22,29 @@ class Answers extends Component {
     ReactDOM.findDOMNode(this).addEventListener('scroll', this.handleScroll);
   }
 
+//  componentWillUpdate() {
+//    this.fetchData(1)
+//  }
+
   componentWillUnmount() {
     clearInterval(this.timer);
   }
 
   // get the 10 most recent answers- must also know the comment
   // id so you can go back and get the 10 before that
-  fetchData(update) {
+  fetchData(oldestAnswerId) {
  //   this.setState( { localTrigger : 0 } );
     //console.log("update = ", update);
-    this.props.unTriggerAnswers();
+  //  this.props.unTriggerAnswers();
     let retArr = [];
-    let thisOldAnswerId = 0;
     console.log("up here oldestaid = ", this.state.oldestAnswerId);
-    fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + this.state.oldestAnswerId)
+    // fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + this.state.oldestAnswerId)
+    fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + oldestAnswerId)
     // I need to send the answer_id, but in python I can default if 
     // there is none to just getting the most recent
       .then(response => response.json())
       .then(data =>  {
+         let thisOldAnswerId = 0;
          data.forEach(function(element) {
            retArr.push([element['answer'], element['answerId']]);
 		   // so I think I need to make retArr [[answer, answer_id]... and then sort it by answer_id
@@ -80,12 +85,13 @@ class Answers extends Component {
 	   retAnsArr.push(element[0]);
 	 });
          this.setState( { commentBatch : retAnsArr } )
+         //
          console.log("toai ", thisOldAnswerId);
-         if (update === 1) { 
-           console.log("I should get here if it comes from scrolling");
+        // if (update === 1) { 
+        //   console.log("I should get here if it comes from scrolling");
            this.setState({ oldestAnswerId : thisOldAnswerId })
        //    this.props.triggerAnswers();
-         }
+       //  }
 	 console.log("there");
 	 console.log("there", this.state.oldestAnswerId);
 	// this.props.triggerAnswers();
@@ -94,19 +100,21 @@ class Answers extends Component {
       })
       .then( () => {
         console.log("hi I am in the future");
-        this.props.triggerAnswers();
+      //  this.props.triggerAnswers();
       })
       .catch(error => {
       this.setState({ error, isLoading: false});
         console.log("error: ", error);
       })
-      console.log("down here oldestaid = ", this.state.oldestAnswerId);
+      console.log("up down here oldestaid = ", this.state.oldestAnswerId);
   }
 
   handleScroll = (event) => {
      if (ReactDOM.findDOMNode(this).scrollHeight - ReactDOM.findDOMNode(this).offsetHeight - 1 < ReactDOM.findDOMNode(this).scrollTop) {
        if (this.state.activeScrollListener) {
-        this.fetchData(1);
+         console.log("down here oldestaid is ", this.state.oldestAnswerId);
+       //  this.props.triggerAnswers();
+        this.fetchData(this.state.oldestAnswerId);
        }
      //  this.setState({ activeScrollListener : false });
 	//   this.props.triggerAnswers();
@@ -122,10 +130,10 @@ class Answers extends Component {
         });
       }
     }
+        // {(this.props.trigger)}
     return(
           <div className="answerBox">
           {display}
-        {(this.props.trigger)}
           </div>
 	);
     }
