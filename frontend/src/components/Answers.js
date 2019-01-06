@@ -16,10 +16,10 @@ class Answers extends Component {
 
   componentDidMount() {
     this.fetchData(0);
-    this.timer = setInterval(() => {
-        this.props.triggerAnswers();
-        this.setState( { activeScrollListener : true });
-      }, 5000);
+ //   this.timer = setInterval(() => {
+ //       this.props.triggerAnswers();
+ //       this.setState( { activeScrollListener : true });
+ //     }, 1000);
     ReactDOM.findDOMNode(this).addEventListener('scroll', this.handleScroll);
   }
 
@@ -31,7 +31,7 @@ class Answers extends Component {
   // id so you can go back and get the 10 before that
   fetchData(update) {
  //   this.setState( { localTrigger : 0 } );
-    console.log("update = ", update);
+    //console.log("update = ", update);
     this.props.unTriggerAnswers();
     let retArr = [];
     let thisOldAnswerId = 0;
@@ -41,22 +41,41 @@ class Answers extends Component {
       .then(response => response.json())
       .then(data =>  {
          data.forEach(function(element) {
-           retArr.push(element['answer']);
-           if (thisOldAnswerId == 0) {
+           retArr.push([element['answer'], element['answerId']]);
+		   // so I think I need to make retArr [[answer, answer_id]... and then sort it by answer_id
+		   // then just getting the last member will be the oldest (i think)
+           console.log("hi");
+		   if (thisOldAnswerId == 0) {
               thisOldAnswerId = element['answerId'];
            } else {
              if (element['answerId'] < thisOldAnswerId) {
                thisOldAnswerId = element['answerId'];
              }
            }
-           //I also need the answer_id of the last one
-           //so I can then ask for 10 with lower answerids
-           //
+           //TODO: If I get one with less than 10 or maybe receive a signal that
+		   // it was the last set I need to turn off the listener to scrolling down that can
+		   // ask for more - or maybe in python just send the last 10?
+		   // yeah that because I don't want to really ever get less than 10 if they are available
+		   
+		   // when you get to the bottom of scroll it doesn't re-fetch right away
+		   
+		   
            //when new picture comes after closing modal
            //get new answers
          });
-         this.setState( { commentBatch : retArr } )
+		 retArr = retArr.sort(function(a, b) {
+			 return b[1] - a[1];
+		 });
+		 //console.log("down here retArr is ", retArr);
+		 let retAnsArr = [];
+		 retArr.forEach(function(element) {
+			 retAnsArr.push(element[0]);
+		 });
+         this.setState( { commentBatch : retAnsArr } )
          if (update === 1) { this.setState({ oldestAnswerId : thisOldAnswerId })}
+		 console.log("there");
+	//	 this.props.triggerAnswers();
+	//	 this.props.unTriggerAnswers();
       })
       .catch(error => {
       this.setState({ error, isLoading: false});
@@ -70,6 +89,7 @@ class Answers extends Component {
         this.fetchData(1);
        }
        this.setState({ activeScrollListener : false });
+	   this.props.triggerAnswers();
      }
   }
 
