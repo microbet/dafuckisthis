@@ -9,6 +9,7 @@ class Answers extends Component {
           commentBatch : '',
           oldestAnswerId : 0,
           activeScrollListener : true,
+          scrollTimer : true,
         }
      //   this.fetchData = this.fetchData.bind(this);
   }
@@ -21,6 +22,11 @@ class Answers extends Component {
  //     }, 1000);
     ReactDOM.findDOMNode(this).addEventListener('scroll', this.handleScroll);
   }
+
+ //   this.timer = setInterval(() => {
+ //       this.props.triggerAnswers();
+ //       this.setState( { activeScrollListener : true });
+ //     }, 1000);
 
 //  componentWillUpdate() {
 //    this.fetchData(1)
@@ -37,7 +43,7 @@ class Answers extends Component {
     //console.log("update = ", update);
   //  this.props.unTriggerAnswers();
     let retArr = [];
-    console.log("up here oldestaid = ", this.state.oldestAnswerId);
+    //console.log("up here oldestaid = ", this.state.oldestAnswerId);
     // fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + this.state.oldestAnswerId)
     fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + oldestAnswerId)
     // I need to send the answer_id, but in python I can default if 
@@ -49,7 +55,7 @@ class Answers extends Component {
            retArr.push([element['answer'], element['answerId']]);
 		   // so I think I need to make retArr [[answer, answer_id]... and then sort it by answer_id
 		   // then just getting the last member will be the oldest (i think)
-           console.log("hi");
+           //console.log("hi");
 		   if (thisOldAnswerId == 0) {
               thisOldAnswerId = element['answerId'];
            } else {
@@ -86,27 +92,27 @@ class Answers extends Component {
 	 });
          this.setState( { commentBatch : retAnsArr } )
          //
-         console.log("toai ", thisOldAnswerId);
+         //console.log("toai ", thisOldAnswerId);
         // if (update === 1) { 
         //   console.log("I should get here if it comes from scrolling");
            this.setState({ oldestAnswerId : thisOldAnswerId })
        //    this.props.triggerAnswers();
        //  }
-	 console.log("there");
-	 console.log("there", this.state.oldestAnswerId);
+	 //console.log("there");
+	 //console.log("there", this.state.oldestAnswerId);
 	// this.props.triggerAnswers();
-        console.log(this.state.commentBatch);
+        //console.log(this.state.commentBatch);
 	//	 this.props.unTriggerAnswers();
       })
       .then( () => {
-        console.log("hi I am in the future");
+        //console.log("hi I am in the future");
       //  this.props.triggerAnswers();
       })
       .catch(error => {
       this.setState({ error, isLoading: false});
         console.log("error: ", error);
       })
-      console.log("up down here oldestaid = ", this.state.oldestAnswerId);
+      //console.log("up down here oldestaid = ", this.state.oldestAnswerId);
   }
   
   // dunno if this should be a separate function from fetchData or not, maybe combine later
@@ -114,14 +120,23 @@ class Answers extends Component {
     fetch( this.props.DATA_URI + "/get_next_answer?imageId=" + imageId + "&answerId=" + answerId)
       .then(response => response.json())
       .then(data =>  {
-		  console.log("data returned from fetchNextAnswer is ", data);
-		  console.log("commentBatch is ", this.state.commentBatch)
+		  //console.log("data returned from fetchNextAnswer is ", data);
+		  //console.log("commentBatch is ", this.state.commentBatch)
 		  if (data.response != 'oldest') {
 			let tempArr = this.state.commentBatch;
 			tempArr.push(data[0]['answer']);
 			tempArr.shift();
 			this.setState( { commentBatch : tempArr } );
 			this.setState( { oldestAnswerId : data[0]['answerId'] } );
+                        console.log(data[0]['answerId']);
+                        console.log(imageId);
+                        if (this.state.scrollTimer) {
+                          this.timer = setInterval(() => {
+                         //  this.fetchNextAnswer(data[0]['answerId'], imageId);
+                           this.handleScroll();
+                          }, 1000);
+                          this.setState( { scrollTimer : false } );
+                        }
 		  }
 	  })
 	  .catch(error => {
@@ -133,20 +148,19 @@ class Answers extends Component {
   handleScroll = (event) => {
      if (ReactDOM.findDOMNode(this).scrollHeight - ReactDOM.findDOMNode(this).offsetHeight - 1 < ReactDOM.findDOMNode(this).scrollTop) {
        if (this.state.activeScrollListener) {
-         console.log("down here oldestaid is ", this.state.oldestAnswerId);
-       //  this.props.triggerAnswers();
-       // this.fetchData(this.state.oldestAnswerId);
 		this.fetchNextAnswer(this.state.oldestAnswerId, this.props.imageId);
-	   }
-     //  this.setState({ activeScrollListener : false });
-	//   this.props.triggerAnswers();
+       }
      }
+       if (ReactDOM.findDOMNode(this).scrollHeight - ReactDOM.findDOMNode(this).offsetHeight - 10 < ReactDOM.findDOMNode(this).scrollTop) {
+         clearInterval(this.timer);
+         this.setState( { scrollTimer : true } );
+       }
   }
   
-  // ok, if the scroll event happens I want it to keep fetching the next answer like once a second
   // and then stop if you scroll away
   // if you have kept it there scrolling down for more than like 5 seconds it should fetch answer
   // like 5 times a second, I definitely need to generalize this behavior for scrolling back up
+           // need to impliment scrolling up
 
   render() {
     let display = [];
