@@ -12,3 +12,11 @@ I'm going to use Auth0 I think and already have an account there under jay.new..
 
 should also look at this (maybe first) for securing the api
 https://auth0.com/docs/quickstart/backend/python/01-authorization
+
+auth0, dafuck-api, https://173.255.247.69/dafuck-api
+public key in JSON Web Key Set format
+RS256 algorithm
+
+don't have python-dotenv, python-jose-cryptodome, flask-cors
+do have flask and six
+python-jose-cryptodome only has 5 stars - ok anyway
