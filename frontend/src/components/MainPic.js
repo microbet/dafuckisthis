@@ -18,11 +18,11 @@ class MainPic extends Component {
                         showCaption: false,
                         capButton: 'Submit Caption',
                         showPreview: false,
-                        imageId: null,
                         imagePath: null,
                         trigger: 0,
                         selectedImage: this.props.selectedImage,
                 }
+         // console.log("tp i m = ", this.props);
 	}
 
   showModal = () => {
@@ -58,6 +58,7 @@ class MainPic extends Component {
       headers: {
         'Accept': 'application/json',
       },
+      credentials : 'same-origin',
       body: fd
     })
     .then((response) => response.json())
@@ -72,7 +73,6 @@ class MainPic extends Component {
         imageId : data.image_id,
         imagePath : data.imagePath,
       } );
-      console.log("and here imageId is ", data.image_id);
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
@@ -88,7 +88,8 @@ class MainPic extends Component {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-      },
+      }, 
+      credentials : 'same-origin',
       body: fd
     })
     .then((response) => response.json())
@@ -102,9 +103,11 @@ class MainPic extends Component {
   }
 
   fetchData(msg='') {
-    console.log("msg = ", msg);
-    console.log("sel image = ", this.state.selectedImage);
-    fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.state.selectedImage)
+    fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.state.selectedImage, {
+      credentials : 'same-origin',
+      method: 'GET',
+      headers: { 'Accept': 'application/json', },
+    })
 	.then(response => response.json())
          .then(data =>  {
            this.setState( { 
@@ -113,7 +116,6 @@ class MainPic extends Component {
              flaskMessage : data.message,
              imageId : data.image_id,
            })
-           console.log("here imageId is ", data.image_id);
          })
          .catch(error => {
            this.setState({ error, isLoading: false});
@@ -152,7 +154,7 @@ class MainPic extends Component {
     if (this.state.showPreview) {
       return (
         <div>
-        <img src={this.props.DATA_URI + this.state.imagePath} />
+        <img src={this.props.DATA_URI + this.state.imagePath} alt="what is it img" />
         </div>
       );
     }
@@ -176,7 +178,7 @@ class MainPic extends Component {
 		{ this.state.mainPicCaption }
         <br />
          <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId} triggerAnswers={this.triggerAnswers}/>
-          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} /> }
+          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> }
          <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
                   {this.renderCaption()}
@@ -228,6 +230,7 @@ class AddComment extends Component {
       headers: {
         'Accept': 'application/json',
       },
+      credentials : 'same-origin',
       body: fd
     })
     .then((response) => response.json())
@@ -258,7 +261,7 @@ class AddComment extends Component {
       top:this.myRef.current.OffsetTop,
       behavior: "smooth"
     });
-    console.log("do i get here");
+  //  console.log("do i get here");
   }
 
   render() {
