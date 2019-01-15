@@ -138,7 +138,7 @@ class Answers extends Component {
         headers: {
         'Accept': 'application/json',
         },
-        credentials : 'include',
+        credentials : 'same-origin',
         body: fd
       })
       .then(response => response.json())
@@ -152,8 +152,12 @@ class Answers extends Component {
   buildBatch = (attribute, data) => {
     let i = 0;
     let tempArr = this.state.answerBatch;
+	console.log("I got here");
+	console.log("attribute is ", attribute);
+	console.log("data is ", data);
     this.state.answerBatch.forEach( function(element) {
       if (element[1] === attribute) {
+		console.log("and I got here too");
         tempArr[i][2] = data[0][2];
         tempArr[i][3] = data[0][3];
       }
