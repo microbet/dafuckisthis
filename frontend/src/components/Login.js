@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import cookie from 'react-cookies';
 
 class Login extends Component {
 
@@ -21,11 +22,13 @@ class Login extends Component {
         'Accept': 'application/json',
       },
       credentials : "same-origin",
+    //  withCredentials: false,
       body: fd
     })
     .then((response) => response.json())
     .then((data) => {
-      this.props.user.setUser(data.username, data.userId);
+      this.props.user.setUser(data.username, data.userId, data.sessioncode);
+      cookie.save("sessioncode", data.sessioncode, { path: '/', maxAge: 300000 });
       this.props.refresh();
 
     })

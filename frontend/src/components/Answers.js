@@ -133,6 +133,8 @@ class Answers extends Component {
       const fd = new FormData();
       fd.append('answer_id', event.target.getAttribute('thisanswerid'));
       fd.append('vote', event.target.getAttribute('vote'));
+      fd.append('user_id', this.props.user.userId);
+      fd.append('sessionvalue', this.props.user.sessionvalue);
       fetch( this.props.DATA_URI + '/vote', {
         method: 'POST',
         headers: {

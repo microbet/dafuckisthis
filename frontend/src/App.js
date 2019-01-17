@@ -18,6 +18,7 @@ class App extends Component {
 
   refresh = () => {
     this.setState({ answerToggle : 1 });
+    console.log("this happened");
   }
 
   render() {

@@ -2,9 +2,12 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://localhost.com",
   "dependencies": {
     "axios": "^0.18.0",
+    "prop-types": "^15.6.2",
     "react": "^16.6.3",
+    "react-cookies": "^0.1.0",
     "react-dom": "^16.6.3",
     "react-scripts": "^2.1.2"
   },

@@ -8,9 +8,10 @@ class User extends Component {
     this.username = '';
   }
 
-  setUser(username, userId) {
+  setUser(username, userId, sessionvalue) {
     this.username = username;
     this.userId = userId;
+    this.sessionvalue = sessionvalue;
   }
 
   getUserId = () => {
