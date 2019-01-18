@@ -17,17 +17,21 @@ class Answers extends Component {
   }
 
   componentDidMount() {
-    this.fetchData(0);
+    this.fetchData();
     ReactDOM.findDOMNode(this).addEventListener('scroll', this.handleScroll);
   }
 
   componentWillUnmount() {
     clearInterval(this.timer);
   }
+  
+  componentWillReceiveProps(answerToggle) {
+	  this.fetchData();
+  }
 
-  fetchData(oldestAnswerId) {
+  fetchData() {
     let retArr = [];
-    fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + oldestAnswerId, { 
+    fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + 0, { 
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -144,25 +148,24 @@ class Answers extends Component {
         body: fd
       })
       .then(response => response.json())
-      .then(this.buildBatch.bind(null, event.target.getAttribute('thisanswer')))
+	  .then(data => {
+		  this.buildBatch(data['answer_id'], data['up'], data['down'])
+	  })
       .catch(error => {
         console.log("error: ", error);
       });
     }
   }
 
-  buildBatch = (attribute, data) => {
+  buildBatch = (answerId, up, down) => {
     let i = 0;
     let tempArr = this.state.answerBatch;
-	console.log("I got here");
-	console.log("attribute is ", attribute);
-	console.log("data is ", data);
     this.state.answerBatch.forEach( function(element) {
-      if (element[1] === attribute) {
-		console.log("and I got here too");
-        tempArr[i][2] = data[0][2];
-        tempArr[i][3] = data[0][3];
+	  if (element[1] === parseInt(answerId)) {
+		tempArr[i][2] = up;
+        tempArr[i][3] = down;
       }
+	  i++;
     });
     this.setState({ answerBatch : tempArr });
   }
@@ -185,12 +188,13 @@ class Answers extends Component {
         this.state.answerBatch.forEach((element) => {
            display.push(
              <ul key={element[1]}>{element[0]}
-             <div onClick={this.handleUlClick} thisanswerid={element[1]} vote="up" 
-             key={element[1] + 'up'}>{ this.props.answerToggle ? "thumbup " + element[2]  : "" }
-             </div>
-             <div onClick={this.handleUlClick} thisanswerid={element[1]} vote="down" 
-             key={element[1] + 'down'}>{ this.props.answerToggle ? "thumbdown " + element[3]  : "" }
-             </div>
+             <div onClick={this.handleUlClick} thisanswerid={element[1]} vote="up"
+				key={element[1] + 'upvote'}>{ this.props.user.userId ? "thumbup " : null }</div>
+				<div> { element[2] } up</div>
+			<div onClick={this.handleUlClick} thisanswerid={element[1]} vote='down'
+				key={element[1] + 'downvote'}>{ this.props.user.userId ? "thumbdown " : null }</div>
+				<div> { element[3] } down</div>
+	
              </ul>);
         });
 
@@ -199,7 +203,7 @@ class Answers extends Component {
 
     return(
           <div className="answerBox">
-          {display}
+          { display } 
           </div>
 	);
     }

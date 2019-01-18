@@ -17,8 +17,11 @@ class App extends Component {
   }
 
   refresh = () => {
-    this.setState({ answerToggle : 1 });
-    console.log("this happened");
+	if (this.state.answerToggle === 0) {
+		this.setState({ answerToggle : 1 });
+	} else {
+		this.setState({ answerToggle : 0 });
+	}
   }
 
   render() {
@@ -26,7 +29,7 @@ class App extends Component {
       <div className="App">
 	   <MainPic DATA_URI={DATA_URI} selectedImage='latest' user={this.state.user} refresh={this.refresh} answerToggle={this.state.answerToggle} />
           <Login DATA_URI={DATA_URI} user={this.state.user} refresh={this.refresh} />
-          <Register DATA_URI={DATA_URI} />
+			  { this.state.user.userId ? null : <Register DATA_URI={DATA_URI} /> }
       </div>
     );
   }

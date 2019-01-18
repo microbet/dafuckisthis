@@ -22,7 +22,6 @@ class MainPic extends Component {
                         trigger: 0,
                         selectedImage: this.props.selectedImage,
                 }
-         // console.log("tp i m = ", this.props);
 	}
 
   showModal = () => {
@@ -177,7 +176,7 @@ class MainPic extends Component {
 		<br />
 		{ this.state.mainPicCaption }
         <br />
-         <AddComment DATA_URI={this.props.DATA_URI} imageId={this.state.imageId} triggerAnswers={this.triggerAnswers}/>
+         <AddComment DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.state.imageId} refresh={this.props.refresh} triggerAnswers={this.triggerAnswers}/>
           { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> }
          <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
@@ -220,11 +219,14 @@ class AddComment extends Component {
       warning: '',
     }
   }
-
+  
   handleSubmit = () => {
     const fd = new FormData();
     fd.append('comment', this.state.comment);
     fd.append('imageId', this.props.imageId);
+	fd.append('user_id', this.props.user.userId);
+    fd.append('sessionvalue', this.props.user.sessionvalue);
+	document.getElementById('commentbox').value = '';
     fetch( this.props.DATA_URI + '/comment', {
       method: 'POST',
       headers: {
@@ -234,11 +236,12 @@ class AddComment extends Component {
       body: fd
     })
     .then((response) => response.json())
-    .then((data) => { 
-      this.props.triggerAnswers(1);
+    .then((data) => {
+	  this.props.refresh();
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
+	  console.log(error);
     });
   }
 
@@ -261,14 +264,13 @@ class AddComment extends Component {
       top:this.myRef.current.OffsetTop,
       behavior: "smooth"
     });
-  //  console.log("do i get here");
   }
 
   render() {
     return(
       <div ref={this.myRef}>
       {this.renderWarning()}
-      <input type="text" onChange={this.handleChange}/>
+      <input type="text" onChange={this.handleChange} id="commentbox"/>
       <button onClick={this.handleSubmit}>Make Comment</button>
       </div>
     );
