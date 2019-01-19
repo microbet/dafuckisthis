@@ -102,11 +102,15 @@ class MainPic extends Component {
   }
 
   fetchData(msg='') {
-    fetch( this.props.DATA_URI + "/getimage?selected_image=" + this.state.selectedImage, {
+	const fd = new FormData();
+	fd.append('selected_image', this.state.selectedImage);
+    fd.append('imageId', this.state.imageId);
+	fetch( this.props.DATA_URI + "/get_image", {
       credentials : 'same-origin',
-      method: 'GET',
+      method: 'POST',
       headers: { 'Accept': 'application/json', },
-    })
+      body: fd
+	})
 	.then(response => response.json())
          .then(data =>  {
            this.setState( { 
@@ -168,11 +172,42 @@ class MainPic extends Component {
       this.setState( { trigger : 0 } );
     }
   }
+  
+ 
+  handlePrevOrNext(direction) {
+	  console.log(direction);
+	  // should this be a component on its own to avoid unneccesary rerenders
+    const fd = new FormData();
+	fd.append('imageId', this.state.imageId);
+	fd.append('selected_image', direction);
+    fetch( this.props.DATA_URI + '/get_image', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+      },
+      credentials : 'same-origin',
+      body: fd
+    })
+    .then((response) => response.json())
+    .then((data) => {
+		this.setState( { 
+             mainPicPath : data.imagePath,
+             mainPicCaption : data.caption,
+             flaskMessage : data.message,
+             imageId : data.image_id,
+        })
+		this.props.refresh();
+    })
+    .catch((error) => { 
+      this.setState( { warning : 'There was a problem getting that image.' } );
+	  console.log(error);
+    });
+  }
 
   render() {
 	return(
 		<div>
-		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' /> 
+		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' /><div onClick={() => {this.handlePrevOrNext('previous')}}>Prev</div>   <div onClick={() => {this.handlePrevOrNext('next')}}>Next</div> 
 		<br />
 		{ this.state.mainPicCaption }
         <br />
