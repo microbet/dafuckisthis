@@ -42,3 +42,12 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+-----
+
+The database is not normalized.  In the answers table I put the total number of up and down votes eventhough these are kept 
+in the user_answer table and could be added.  This is because this could be a very time consuming thing to look up 
+on the fly.  I'm also putting answer_count in the imagemetadata table for the same reason - for the leaderboard.  These 
+things should agree, but the true number should be considered the actual votes and answers and I should write a 
+script to correct them if necessary.

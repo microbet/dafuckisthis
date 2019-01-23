@@ -31,7 +31,7 @@ class App extends Component {
 	   <MainPic DATA_URI={DATA_URI} selectedImage='latest' user={this.state.user} refresh={this.refresh} answerToggle={this.state.answerToggle} />
           <Login DATA_URI={DATA_URI} user={this.state.user} refresh={this.refresh} />
 			  { this.state.user.userId ? null : <Register DATA_URI={DATA_URI} /> }
-			  <Leaderboard />
+			  <Leaderboard DATA_URI={DATA_URI} />
       </div>
     );
   }
@@ -39,3 +39,5 @@ class App extends Component {
 
 export default App;
 
+// TODO: if the picture is too big and the screen is too small you can't close the modal
+// TODO: resize the images automatically
