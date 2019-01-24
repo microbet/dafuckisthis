@@ -11,6 +11,9 @@ class Answers extends Component {
           answerBatch : [], // [ [answer, answerId, up, down], ... ]
           oldestAnswerId : 0,
           newestAnswerId : 0,
+		  mostUpVotedAnswerBatch : 0,
+		  oldestMostUpVotedAnswerId : 0,
+		  newestMostUpVotedAnswerId : 0,
           scrollTimer : true,
           userId : this.props.user.userId,
     }
@@ -18,6 +21,7 @@ class Answers extends Component {
 
   componentDidMount() {
     this.fetchData();
+	this.fetchMostUpvoted();
     ReactDOM.findDOMNode(this).addEventListener('scroll', this.handleScroll);
   }
 
@@ -29,6 +33,44 @@ class Answers extends Component {
 	  this.fetchData();
   }
 
+  fetchMostUpvoted() {
+	  let retArr = [];
+	  let fd = new FormData();
+	  fd.append('imageId', this.props.imageId);
+	  fetch( this.props.DATA_URI + '/get_mostupvoted', {
+		  method: 'POST',
+		  headers: { 'Accept': 'application/json' },
+		  credentials: 'same-origin',
+		  body: fd,
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+		  let thisOldAnswerId = 0;
+		  let thisNewAnswerId = 0;
+		  data.forEach(function(element) {
+			  retArr.push([element['answer'], element['answerId'], 
+              element['up'], element['down']]);
+	   if (thisOldAnswerId === 0) {
+              thisOldAnswerId = element['answerId'];
+              thisNewAnswerId = element['answerId'];
+           } else {
+             if (element['answerId'] < thisOldAnswerId) {
+               thisOldAnswerId = element['answerId'];
+             }
+             if (element['answerId'] > thisNewAnswerId) {
+               thisNewAnswerId = element['answerId'];
+             }
+           }
+         });
+         this.setState( { mostUpVotedAnswerBatch : retArr } )
+         this.setState({ oldestMostUpVotedAnswerId : thisOldAnswerId })
+         this.setState({ newestMostUpVotedAnswerId : thisNewAnswerId })
+      })
+      .catch(error => {
+        console.log("error: ", error);
+      })
+  }
+  
   fetchData() {
     let retArr = [];
     fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + 0, { 
@@ -156,6 +198,10 @@ class Answers extends Component {
       });
     }
   }
+  
+  handleMostUpVotedClick = (event) => {
+	  console.log("hi");
+  }
 
   buildBatch = (answerId, up, down) => {
     let i = 0;
@@ -193,18 +239,39 @@ class Answers extends Component {
 				<div> { element[2] } up</div>
 			<div onClick={this.handleUlClick} thisanswerid={element[1]} vote='down'
 				key={element[1] + 'downvote'}>{ this.props.user.userId ? "thumbdown " : null }</div>
-				<div> { element[3] } down</div>
-	
+				<div> { element[3] } down</div>	
              </ul>);
         });
-
       }
     }
-
+	let mostUpVotedDisplay = []
+	if (Array.isArray(this.state.mostUpVotedAnswerBatch)) {
+		if (this.state.mostUpVotedAnswerBatch.length > 0) {
+			this.state.mostUpVotedAnswerBatch.forEach((element) => {
+				mostUpVotedDisplay.push(
+					<ul key={element[1] + 'mostupvoted'}>{element[0]}
+			<div onClick={this.handleMostUpVotedClick} thisanswerid={element[1]} vote='up'
+				key={element[1] + 'upMostvote'}>{ this.props.user.userId ? "thumbup " : null }</div>
+				<div> { element[2] } up</div>
+			<div onClick={this.handleMostUpVotedClick} thisanswerid={element[1]} vote='down'
+				key={element[1] + 'downvote'}>{ this.props.user.userId ? "thumbdown " : null }</div>
+				<div> { element[3] } down</div>
+				</ul>);
+		});
+	  }
+	}
+	
     return(
+	<div>
           <div className="answerBox">
-          { display } 
+          { display }
+		  </div>
+			<br />
+			<br />
+			<div className="answerBox">
+			{ mostUpVotedDisplay }
           </div>
+		  </div>
 	);
     }
 }
