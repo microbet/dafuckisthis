@@ -40,4 +40,7 @@ class App extends Component {
 export default App;
 
 // TODO: if the picture is too big and the screen is too small you can't close the modal
-// TODO: resize the images automatically
+// TODO: resize the images automatically, done, could be done better maybe
+// TODO: the mostupvoted list doesn't update automatically upon voting
+// it also doesn't show any that have zero upvotes, but some downvotes
+// should just be order of favorability

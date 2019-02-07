@@ -3,26 +3,28 @@ import Answers from './Answers';
 import './MainPic.css';
 
 class MainPic extends Component {
-	constructor(props){
-		super(props);
-		this.state = {
-                        show: false,
-                        isLoading: true,
-			mainPicPath : '',
-			mainPicCaption : '',
-                        flaskMessage : '',
-                        error: null,
-                        imageId: null,
-                        selectedFile: null,
-                        showFileUpload: true,
-                        showCaption: false,
-                        capButton: 'Submit Caption',
-                        showPreview: false,
-                        imagePath: null,
-                        trigger: 0,
-                        selectedImage: this.props.selectedImage,
-                }
-	}
+  constructor(props){
+    super(props);
+    this.state = {
+      show: false,
+      isLoading: true,
+      mainPicPath : '',
+      mainPicCaption : '',
+      flaskMessage : '',
+      error: null,
+      imageId: null,
+      selectedFile: null,
+      showFileUpload: true,
+      showCaption: false,
+      capButton: 'Submit Caption',
+      showPreview: false,
+      imagePath: null,
+      trigger: 0,
+      selectedImage: this.props.selectedImage,
+      showNext: true,
+      showPrev: true,
+    }
+  }
 
   showModal = () => {
     this.setState({ show: true });
@@ -102,23 +104,28 @@ class MainPic extends Component {
   }
 
   fetchData(msg='') {
-	const fd = new FormData();
-	fd.append('selected_image', this.state.selectedImage);
-    fd.append('imageId', this.state.imageId);
-	fetch( this.props.DATA_URI + "/get_image", {
+    fetch( this.props.DATA_URI + "/get_image?imageId" + this.state.imageId
+       + "&selected_image=" + this.state.selectedImage, {
       credentials : 'same-origin',
-      method: 'POST',
+      method: 'GET',
       headers: { 'Accept': 'application/json', },
-      body: fd
 	})
 	.then(response => response.json())
          .then(data =>  {
+           console.log(data);
            this.setState( { 
              mainPicPath : data.imagePath,
              mainPicCaption : data.caption,
              flaskMessage : data.message,
              imageId : data.image_id,
            })
+           if (data.imagePosition === 'last') {
+             this.setState( { showNext : false, showPrev : true } );
+           } else if (data.imagePosition === 'first') {
+             this.setState( { showPrev : false, showNext : true } );
+           } else {
+             this.setState( { showPrev : true, showNext : true } );
+           }
          })
          .catch(error => {
            this.setState({ error, isLoading: false});
@@ -175,28 +182,38 @@ class MainPic extends Component {
   
  
   handlePrevOrNext(direction) {
-	  console.log(direction);
-	  // should this be a component on its own to avoid unneccesary rerenders
-    const fd = new FormData();
-	fd.append('imageId', this.state.imageId);
-	fd.append('selected_image', direction);
-    fetch( this.props.DATA_URI + '/get_image', {
-      method: 'POST',
+    console.log(direction);
+    // should this be a component on its own to avoid unneccesary rerenders
+    fetch( this.props.DATA_URI + '/get_image?imageId='+this.state.imageId+
+      '&selected_image=' + direction, {
+      method: 'GET',
       headers: {
         'Accept': 'application/json',
       },
       credentials : 'same-origin',
-      body: fd
     })
     .then((response) => response.json())
     .then((data) => {
-		this.setState( { 
+      if (data.error) {
+        console.log(data.error);
+      } else {
+      console.log("did I get here?", data);
+	this.setState( { 
              mainPicPath : data.imagePath,
              mainPicCaption : data.caption,
              flaskMessage : data.message,
              imageId : data.image_id,
         })
-		this.props.refresh();
+        if (data.imagePosition === 'last') {
+          this.setState( { showNext : false, showPrev : true } );
+
+        } else if (data.imagePosition === 'first') {
+          this.setState( { showPrev : false, showNext : true } );
+        } else {
+          this.setState( { showNext : true, showPrev : true } );
+        }
+	this.props.refresh();
+      }
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem getting that image.' } );
@@ -207,11 +224,11 @@ class MainPic extends Component {
   render() {
 	return(
 		<div>
-		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' /><div onClick={() => {this.handlePrevOrNext('previous')}}>Prev</div>   <div onClick={() => {this.handlePrevOrNext('next')}}>Next</div> 
+		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' />{ this.state.showPrev ? <div onClick={() => {this.handlePrevOrNext('previous')}}>Prev</div> : null }  { this.state.showNext ? <div onClick={() => {this.handlePrevOrNext('next')}}>Next</div> : null }
 		<br />
 		{ this.state.mainPicCaption }
         <br />
-         <AddComment DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.state.imageId} refresh={this.props.refresh} triggerAnswers={this.triggerAnswers}/>
+         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.state.imageId} refresh={this.props.refresh} triggerAnswers={this.triggerAnswers}/>
           { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> }
          <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
@@ -245,30 +262,31 @@ document.body.appendChild(container);
 
 export default MainPic
 
-class AddComment extends Component {
+class AddAnswer extends Component {
 
   constructor() {
     super();
     this.state = {
-      comment: '',
+      answer: '',
       warning: '',
     }
   }
   
-  handleSubmit = () => {
+  handleSubmit = (event) => {
+    event.preventDefault();
     const fd = new FormData();
-    fd.append('comment', this.state.comment);
+    fd.append('answer', this.state.answer);
     fd.append('imageId', this.props.imageId);
-	fd.append('user_id', this.props.user.userId);
+    fd.append('user_id', this.props.user.userId);
     fd.append('sessionvalue', this.props.user.sessionvalue);
-	document.getElementById('commentbox').value = '';
-    fetch( this.props.DATA_URI + '/comment', {
+    document.getElementById('answerbox').value = '';
+    fetch( this.props.DATA_URI + '/answer', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
       },
       credentials : 'same-origin',
-      body: fd
+      body: fd, 
     })
     .then((response) => response.json())
     .then((data) => {
@@ -281,7 +299,7 @@ class AddComment extends Component {
   }
 
   handleChange = event => {
-     this.setState({ comment: event.target.value });
+     this.setState({ answer: event.target.value });
   }
 
   renderWarning() {
@@ -305,8 +323,10 @@ class AddComment extends Component {
     return(
       <div ref={this.myRef}>
       {this.renderWarning()}
-      <input type="text" onChange={this.handleChange} id="commentbox"/>
-      <button onClick={this.handleSubmit}>Make Comment</button>
+      <form onSubmit={this.handleSubmit}>
+      <input type="text" onChange={this.handleChange} id="answerbox"/>
+      <input type="submit" value="Submit" />
+      </form>
       </div>
     );
   }

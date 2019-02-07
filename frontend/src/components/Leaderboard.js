@@ -12,15 +12,10 @@ class Leaderboard extends Component {
 	
   componentDidMount() {
 	  // get the most commented on picture
-	  console.log("what the hecko");
-	  const fd = new FormData();
-	  fd.append("selected_image", "most_answers");
-	  //fd.append("imageId", this.
-      fetch(this.props.DATA_URI + "/get_image", {
-		  method: 'POST',
-		  headers: { 'Accept': 'application/json' },
-		  credentials: 'same-origin',
-		  body: fd
+      fetch(this.props.DATA_URI + "/get_image?selected_image=most_answers", {
+		    method: 'GET',
+		    headers: { 'Accept': 'application/json' },
+		    credentials: 'same-origin',
 	   })
 	   .then((response) => response.json())
 	   .then((data) => {

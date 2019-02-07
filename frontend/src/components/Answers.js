@@ -8,20 +8,20 @@ class Answers extends Component {
     super(props);
   //  var user = new User();
     this.state = {
-          answerBatch : [], // [ [answer, answerId, up, down], ... ]
-          oldestAnswerId : 0,
-          newestAnswerId : 0,
+      answerBatch : [], // [ [answer, answerId, up, down], ... ]
+      oldestAnswerId : 0,
+      newestAnswerId : 0,
 		  mostUpVotedAnswerBatch : 0,
 		  oldestMostUpVotedAnswerId : 0,
 		  newestMostUpVotedAnswerId : 0,
-          scrollTimer : true,
-          userId : this.props.user.userId,
+      scrollTimer : true,
+      userId : this.props.user.userId,
     }
   }
 
   componentDidMount() {
     this.fetchData();
-	this.fetchMostUpvoted();
+	  this.fetchMostUpvoted();
     ReactDOM.findDOMNode(this).addEventListener('scroll', this.handleScroll);
   }
 
@@ -31,6 +31,7 @@ class Answers extends Component {
   
   componentWillReceiveProps(answerToggle) {
 	  this.fetchData();
+	  this.fetchMostUpvoted();
   }
 
   fetchMostUpvoted() {
