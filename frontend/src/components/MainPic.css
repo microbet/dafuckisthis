@@ -25,8 +25,23 @@
   display: none;
 }
 
+<!--
 .answerBox {
   height: 300px;
   width: 300px;
   overflow: auto;
 }
+-->
+
+.mainPic {
+  height: 400px;
+  width: 400px;
+}
+
+.previewPic {
+    width: auto;
+    max-width: 150px;
+    height: auto;
+    max-height: 100px;
+}
+

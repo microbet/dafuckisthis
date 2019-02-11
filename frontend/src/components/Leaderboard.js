@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import Answers from './Answers';
 
 class Leaderboard extends Component {
 	
 	constructor(props){
 		super();
 		this.state = {
-            mostCommented : '',
+      mostCommented : '',
 			imagePath : '',
-                }
+    }
 	}
 	
   componentDidMount() {
@@ -23,7 +24,6 @@ class Leaderboard extends Component {
 				mostCommented : data.image_id,
 				imagePath : data.imagePath 
 				} );
-		   console.log("most commented on image is ", data.image_id);
 	   })
 	   .catch((error) => {
 		   console.log("error is ", error);
@@ -36,6 +36,10 @@ class Leaderboard extends Component {
 		{this.state.mostCommented}
 		<img src={this.props.DATA_URI + this.state.imagePath} alt="what is it img" />
 		Here is the leaderboard!
+    <br />
+    Now I should be able to get an answer component down here with the right
+    answers
+    { this.state.mostCommented ? <Answers imageId={this.state.mostCommented} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> : null }
 	</div>
 	);
     }

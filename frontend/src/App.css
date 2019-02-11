@@ -18,6 +18,16 @@
   color: white;
 }
 
+.App button {
+  background-color: #ffffff;
+  color: #333333;
+  border: none;
+  text-decoration: underline;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
+}
+
 .App-link {
   color: #61dafb;
 }
@@ -29,4 +39,87 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Small-form {
+  color: #333333;
+  display: flex;
+  font-size: 13px;
+  flex-direction: row;
+  align-items: center;
+  margin: 0px auto;
+  width: 95%;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.Small-form input[type=text] {
+  width: 30%;
+  max-width: 200px;
+  min-width: 100px;
+  padding: 0px 3px;
+  margin: 4px 4px;
+  display: inline-block;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 13px;
+  color: #333333;
+}
+
+.Small-form input[type=submit] {
+  border: none;
+  background-color: #999;
+  border-radius: 8px;
+  color: white;
+  padding: 1px 6px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.Main-image {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: #7e8aab;
+}
+
+.Answer-box {
+  color: #333333;
+  display: flex;
+  font-weight: bold;
+  font-size: 18px;
+  flex-direction: column;
+  align-items: center;
+  margin: 0px auto;
+  width: 95%;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.Answer-box input[type=text] {
+  width: 100%;
+  max-width: 500px;
+  min-width: 100px;
+  padding: 0px 3px;
+  margin: 4px 4px;
+  display: inline-block;
+  border: 4px solid #7e8aab;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 18px;
+  color: #333333;
+}
+
+.Answer-box input[type=submit] {
+  border: none;
+  background-color: #7e8aab;
+  border-radius: 8px;
+  color: white;
+  padding: 3px 8px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
 }

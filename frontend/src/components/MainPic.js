@@ -20,9 +20,11 @@ class MainPic extends Component {
       showPreview: false,
       imagePath: null,
       trigger: 0,
-      selectedImage: this.props.selectedImage,
+     // selectedImage: this.props.selectedImage, // this shouldn't happen
+      selectedImage: 'latest', // this shouldn't happen
       showNext: true,
       showPrev: true,
+      newImageId: '',
     }
   }
 
@@ -54,6 +56,8 @@ class MainPic extends Component {
     const fd = new FormData();
     fd.append('file', this.state.selectedFile, this.state.selectedFile.name);
     fd.append('caption', this.state.caption);
+    fd.append('user_id', this.props.user.userId);
+    fd.append('sessionvalue', this.props.user.sessionvalue);
     fetch( this.props.DATA_URI + '/upload_image', {
       method: 'POST',
       headers: {
@@ -104,15 +108,15 @@ class MainPic extends Component {
   }
 
   fetchData(msg='') {
-    fetch( this.props.DATA_URI + "/get_image?imageId" + this.state.imageId
-       + "&selected_image=" + this.state.selectedImage, {
+    fetch( this.props.DATA_URI + "/get_image?imageId=" + this.state.imageId
+       + "&selected_image=" + this.state.selectedImage + "&user_id=" 
+       + this.props.user.userId + "&sessionvalue=" + this.props.user.sessionvalue, {
       credentials : 'same-origin',
       method: 'GET',
       headers: { 'Accept': 'application/json', },
 	})
 	.then(response => response.json())
          .then(data =>  {
-           console.log(data);
            this.setState( { 
              mainPicPath : data.imagePath,
              mainPicCaption : data.caption,
@@ -164,7 +168,7 @@ class MainPic extends Component {
     if (this.state.showPreview) {
       return (
         <div>
-        <img src={this.props.DATA_URI + this.state.imagePath} alt="what is it img" />
+        <img src={this.props.DATA_URI + this.state.imagePath} alt="what is it img" className="previewPic" />
         </div>
       );
     }
@@ -182,10 +186,14 @@ class MainPic extends Component {
   
  
   handlePrevOrNext(direction) {
-    console.log(direction);
     // should this be a component on its own to avoid unneccesary rerenders
+    // if this.state.selectedImage is user nd direction is previous or next
+    // need to get the next or previous from that user
+    // so need to send something more to api
+    if (this.state.selectedImage === 'user') { direction = "user_" + direction; }
     fetch( this.props.DATA_URI + '/get_image?imageId='+this.state.imageId+
-      '&selected_image=' + direction, {
+      '&selected_image=' + direction + "&user_id=" + this.props.user.userId 
+      + "&sessionvalue=" + this.props.user.sessionvalue, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -197,7 +205,6 @@ class MainPic extends Component {
       if (data.error) {
         console.log(data.error);
       } else {
-      console.log("did I get here?", data);
 	this.setState( { 
              mainPicPath : data.imagePath,
              mainPicCaption : data.caption,
@@ -221,12 +228,65 @@ class MainPic extends Component {
     });
   }
 
+  sortPic(type) {
+    if (type === 'mostAnswers') { 
+      this.setState( { selectedImage : 'most_answers' }, () => this.fetchData());
+    }
+    if (type === 'latest') { 
+      this.setState( { selectedImage : 'latest' }, () => this.fetchData());
+    }
+    if (type === 'user') {
+      this.setState( { selectedImage : 'user' }, () => this.fetchData());
+    }
+  }
+
+  handleNewImageChange = event => {
+    this.setState({ newImageId : event.target.value });
+  }
+
+  setImage = (event) => {
+    event.preventDefault();
+    this.setState({ imageId : this.state.newImageId, selectedImage : '' }, () => this.fetchData());
+  }
+
+
   render() {
+
+    var caption = {
+      fontWeight : 'normal',
+      fontSize : '16px',
+      fontStyle : 'italic',
+    }
+
+  var leftArrow = 
+  <svg width="15" height="10" onClick={() => this.handlePrevOrNext("previous")}>
+  <line x1="0" y1="5" x2="15" y2="5" stroke="#000000" strokeWidth="3" />
+  <line x1="0" y1="5" x2="10" y2="0" stroke="#000000" strokeWidth="2" />
+  <line x1="0" y1="5" x2="10" y2="10" stroke="#000000" strokeWidth="2" />
+</svg>;
+
+  var rightArrow = 
+  <svg width="15" height="10" onClick={() => this.handlePrevOrNext("next")}>
+  <line x1="0" y1="5" x2="15" y2="5" stroke="#000000" strokeWidth="3" />
+  <line x1="15" y1="5" x2="5" y2="0" stroke="#000000" strokeWidth="2" />
+  <line x1="15" y1="5" x2="5" y2="10" stroke="#000000" strokeWidth="2" />
+</svg>;
+
 	return(
 		<div>
-		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' />{ this.state.showPrev ? <div onClick={() => {this.handlePrevOrNext('previous')}}>Prev</div> : null }  { this.state.showNext ? <div onClick={() => {this.handlePrevOrNext('next')}}>Next</div> : null }
-		<br />
+          <button onClick={() => {this.sortPic('latest')}}>Most Recent</button>
+            <button onClick={() => {this.sortPic('mostAnswers')}}>Most Answers</button>
+      { (this.props.user.userId && (this.state.selectedImage !== 'user')) ? <button onClick={() => {this.sortPic('user')}}>Your Pics</button> : null }
+      { (this.props.user.userId && (this.state.selectedImage === 'user')) ? <button onClick={() => {this.sortPic('user')}}>All Pics</button> : null }
+              <br />
+          { this.state.showPrev ? <span>{leftArrow}<button onClick={() => {this.handlePrevOrNext('previous')}}>Prev</button>&nbsp;&nbsp;&nbsp;</span> : null }  { this.state.showNext ? <span>&nbsp;&nbsp;&nbsp;<button onClick={() => {this.handlePrevOrNext('next')}}>Next</button>{rightArrow}</span> : null }
+          <div className="Main-image">
+		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' /><br />
+          </div>
+          <span style={caption}>
 		{ this.state.mainPicCaption }
+  </span>
+		<br />
         <br />
          <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.state.imageId} refresh={this.props.refresh} triggerAnswers={this.triggerAnswers}/>
           { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> }
@@ -238,6 +298,10 @@ class MainPic extends Component {
            <button type="button" onClick={this.showModal}>
          Upload 
          </button>
+          <form onSubmit={this.setImage}>
+          <input type="text" onChange={this.handleNewImageChange} />
+          <input type="submit" value="submit" />
+          </form>
 	</div>
 	);
     }
@@ -272,6 +336,9 @@ class AddAnswer extends Component {
     }
   }
   
+  // doesn't this really belong in Answer?
+  // if you submit a blank answer after another non-blank answer
+  // it repeats the same answer
   handleSubmit = (event) => {
     event.preventDefault();
     const fd = new FormData();
@@ -290,6 +357,12 @@ class AddAnswer extends Component {
     })
     .then((response) => response.json())
     .then((data) => {
+          if (data.error) {
+            this.setState( { warning : data.error } );
+            return null;
+          } else {
+            this.setState( { warning : '' } );
+          }
 	  this.props.refresh();
     })
     .catch((error) => { 
@@ -321,11 +394,12 @@ class AddAnswer extends Component {
 
   render() {
     return(
-      <div ref={this.myRef}>
+      <div ref={this.myRef} className="Answer-box">
       {this.renderWarning()}
+      <div>What is it?</div>
       <form onSubmit={this.handleSubmit}>
       <input type="text" onChange={this.handleChange} id="answerbox"/>
-      <input type="submit" value="Submit" />
+      <input type="submit" value="Submit Answer" />
       </form>
       </div>
     );

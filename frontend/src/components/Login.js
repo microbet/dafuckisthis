@@ -11,7 +11,8 @@ class Login extends Component {
     this.setState( { password: event.target.value } );
   }
 
-  handleLogin = () => {
+  handleLogin = (event) => {
+   event.preventDefault(); 
 	const fd = new FormData();
     fd.append('username', this.state.username);
     fd.append('password', this.state.password);
@@ -46,11 +47,12 @@ class Login extends Component {
 const LoginForm = ({ uHandler, pHandler, lHandler }) => {
  
   return(
-   <div>
-   Login<br />
+   <div className="Small-form">
+      <form onSubmit={lHandler}>
       Username: <input type="text" onChange={uHandler}/>
       Password: <input type="text" onChange={pHandler}/>
-      <button onClick={lHandler}>Log in</button>
+      <input type="submit" value="submit" />
+      </form>
     </div>
     );
 };
