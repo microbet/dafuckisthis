@@ -38,22 +38,23 @@ class Login extends Component {
   render() {
     return(
       <div>
-	  { this.props.user.userId ?  <WelcomeUser username={this.props.user.username} /> : <LoginForm uHandler={this.handleUnameChange} pHandler={this.handlePwordChange} lHandler={this.handleLogin} /> }
+	  { this.props.user.userId ?  <WelcomeUser username={this.props.user.username} /> : <LoginForm uHandler={this.handleUnameChange} pHandler={this.handlePwordChange} lHandler={this.handleLogin} switchForm={this.props.switchForm} /> }
 	  </div>
 	  );
   }
 }
    
-const LoginForm = ({ uHandler, pHandler, lHandler }) => {
+const LoginForm = ({ uHandler, pHandler, lHandler, switchForm }) => {
  
   return(
-   <div className="Small-form">
-      <form onSubmit={lHandler}>
+   <span className="Small-form">
+      <form onSubmit={lHandler} styles="display: inline;" >
       Username: <input type="text" onChange={uHandler}/>
       Password: <input type="text" onChange={pHandler}/>
-      <input type="submit" value="submit" />
+      <input type="submit" value="log in" />
       </form>
-    </div>
+    <button onClick={(show) => switchForm('register')}  styles="display: inline" className="Text-button"><font size="1">Need to register?</font></button>
+    </span>
     );
 };
 

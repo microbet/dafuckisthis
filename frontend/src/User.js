@@ -20,5 +20,3 @@ class User extends Component {
 }
 
 export default User
-
-// set the user like sizeup is set

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Answers from './Answers';
 import './MainPic.css';
+import Answers from './Answers';
 
 class MainPic extends Component {
   constructor(props){
@@ -251,7 +251,8 @@ class MainPic extends Component {
 
 
   render() {
-
+   // console.log(window.document.getElementsByTagName('body')[0].clientWidth);
+  //  console.log(window.document.getElementsByTagName('body'));
     var caption = {
       fontWeight : 'normal',
       fontSize : '16px',

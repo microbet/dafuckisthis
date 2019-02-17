@@ -18,7 +18,7 @@ class Register extends Component {
     this.setState( { password: event.target.value } );
   }
 
-  handleLogin = () => {
+  handleRegister = () => {
 
     const fd = new FormData();
     fd.append('username', this.state.username);
@@ -42,12 +42,14 @@ class Register extends Component {
   render() {
 
     return(
-      <div>
-      Register<br />
+      <span className="Small-form">
+      <form onSubmit={this.handleRegister}>
       Username: <input type="text" onChange={this.handleUnameChange}/>
       Password: <input type="text" onChange={this.handlePwordChange}/>
-      <button onClick={this.handleLogin}>Log in</button>
-      </div>
+      <input type="submit" value="register" />
+      </form>
+       <button onClick={(show) => this.props.switchForm('login')}  styles="display: inline" className="Text-button"><font size="1">Need to log in?</font></button>
+      </span>
     );
   }
 }
