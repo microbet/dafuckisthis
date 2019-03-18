@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './MainPic.css';
-import Answers from './Answers';
 
 class MainPic extends Component {
   constructor(props){
@@ -12,7 +11,7 @@ class MainPic extends Component {
       mainPicCaption : '',
       flaskMessage : '',
       error: null,
-      imageId: null,
+    //  imageId: null,
       selectedFile: null,
       showFileUpload: true,
       showCaption: false,
@@ -25,6 +24,22 @@ class MainPic extends Component {
       showNext: true,
       showPrev: true,
       newImageId: '',
+      appClass : 'App',
+      picNav : 'Pic-wide',
+    }
+  }
+
+  componentDidMount() {
+    this.fetchData();
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    if (window.innerWidth < 1000) {
+      this.setState({ appClass : "Narrow-format", picNav : "Pic-narraow" });
+    } else {
+      this.setState({ appClass : "Wide-format", picNav : "Pic-wide" });
     }
   }
 
@@ -46,7 +61,9 @@ class MainPic extends Component {
   }
 
   handleUpload = () => {
-    
+    // this is causing mainpic to rerender and I want to avoid that
+    // so I can keep the picture in the modal and add the caption
+    // I may need to move the modal out of mainpic to do this
     if (!this.state.selectedFile) { 
       this.setState( { warning : 'No file selected' } );
       return;
@@ -76,8 +93,11 @@ class MainPic extends Component {
         showCaption : true,
         showPreview: true,
         imageId : data.image_id,
-        imagePath : data.imagePath,
+      //  imagePath : data.imagePath,
       } );
+      // maybe this shouldn't be set yet?
+      // I think it's causing a refresh and closing the modal?
+       this.props.user.setImageId(data.image_id);
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
@@ -85,10 +105,9 @@ class MainPic extends Component {
   }
 
   handleCaption = () => {
-    
     const fd = new FormData();
     fd.append('caption', this.state.caption);
-    fd.append('imageId', this.state.imageId);
+    fd.append('imageId', this.props.user.imageId);
     fetch( this.props.DATA_URI + '/caption', {
       method: 'POST',
       headers: {
@@ -108,7 +127,7 @@ class MainPic extends Component {
   }
 
   fetchData(msg='') {
-    fetch( this.props.DATA_URI + "/get_image?imageId=" + this.state.imageId
+    fetch( this.props.DATA_URI + "/get_image?imageId=" + this.props.user.imageId
        + "&selected_image=" + this.state.selectedImage + "&user_id=" 
        + this.props.user.userId + "&sessionvalue=" + this.props.user.sessionvalue, {
       credentials : 'same-origin',
@@ -121,8 +140,9 @@ class MainPic extends Component {
              mainPicPath : data.imagePath,
              mainPicCaption : data.caption,
              flaskMessage : data.message,
-             imageId : data.image_id,
+  //           imageId : data.image_id,
            })
+           this.props.user.setImageId(data.image_id);
            if (data.imagePosition === 'last') {
              this.setState( { showNext : false, showPrev : true } );
            } else if (data.imagePosition === 'first') {
@@ -137,17 +157,16 @@ class MainPic extends Component {
            })
   }
 
-  componentDidMount() {
-    this.fetchData();
-  }
-
   renderFileUpload() {
     if (this.state.showFileUpload) {
       return (
         <div>
         <font color='white'>Upload new pic</font><br />
-      <input type="file" onChange={this.handleFileChange}/>
-      <button onClick={this.handleUpload}>Upload</button>
+        <form onSubmit={this.handleUpload}>
+      <input type="file" onChange={this.handleFileChange} name="file" id="file"/>
+      <label htmlFor="file">Choose a file</label>
+      <input type="submit" value="Upload" />
+        </form>
         </div>
       );
     }
@@ -191,7 +210,7 @@ class MainPic extends Component {
     // need to get the next or previous from that user
     // so need to send something more to api
     if (this.state.selectedImage === 'user') { direction = "user_" + direction; }
-    fetch( this.props.DATA_URI + '/get_image?imageId='+this.state.imageId+
+    fetch( this.props.DATA_URI + '/get_image?imageId='+this.props.user.imageId+
       '&selected_image=' + direction + "&user_id=" + this.props.user.userId 
       + "&sessionvalue=" + this.props.user.sessionvalue, {
       method: 'GET',
@@ -209,8 +228,10 @@ class MainPic extends Component {
              mainPicPath : data.imagePath,
              mainPicCaption : data.caption,
              flaskMessage : data.message,
-             imageId : data.image_id,
+           //  imageId : data.image_id,
         })
+        this.props.user.setImageId(data.image_id);
+      //  this.props.refresh();
         if (data.imagePosition === 'last') {
           this.setState( { showNext : false, showPrev : true } );
 
@@ -219,7 +240,7 @@ class MainPic extends Component {
         } else {
           this.setState( { showNext : true, showPrev : true } );
         }
-	this.props.refresh();
+//	this.props.refresh();
       }
     })
     .catch((error) => { 
@@ -246,7 +267,8 @@ class MainPic extends Component {
 
   setImage = (event) => {
     event.preventDefault();
-    this.setState({ imageId : this.state.newImageId, selectedImage : '' }, () => this.fetchData());
+    this.props.user.setImageId(this.state.newImageId);
+    this.setState({ selectedImage : '' }, () => this.fetchData());
   }
 
 
@@ -274,37 +296,38 @@ class MainPic extends Component {
 </svg>;
 
 	return(
-		<div>
+	<div className={this.state.appClass}>
+          <div className={this.state.picNav}>
           <button onClick={() => {this.sortPic('latest')}}>Most Recent</button>
             <button onClick={() => {this.sortPic('mostAnswers')}}>Most Answers</button>
       { (this.props.user.userId && (this.state.selectedImage !== 'user')) ? <button onClick={() => {this.sortPic('user')}}>Your Pics</button> : null }
       { (this.props.user.userId && (this.state.selectedImage === 'user')) ? <button onClick={() => {this.sortPic('user')}}>All Pics</button> : null }
               <br />
           { this.state.showPrev ? <span>{leftArrow}<button onClick={() => {this.handlePrevOrNext('previous')}}>Prev</button>&nbsp;&nbsp;&nbsp;</span> : null }  { this.state.showNext ? <span>&nbsp;&nbsp;&nbsp;<button onClick={() => {this.handlePrevOrNext('next')}}>Next</button>{rightArrow}</span> : null }
+          </div>
           <div className="Main-image">
-		   <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' /><br />
+          {this.state.mainPicPath && <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' />}<br /> 
           </div>
           <span style={caption}>
 		{ this.state.mainPicCaption }
   </span>
-		<br />
         <br />
-         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.state.imageId} refresh={this.props.refresh} triggerAnswers={this.triggerAnswers}/>
-          { this.state.imageId && <Answers imageId={this.state.imageId} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> }
+         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.props.user.imageId} triggerAnswers={this.triggerAnswers}/>
          <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
                   {this.renderCaption()}
                   {this.previewPic()}
           </Modal>
-           <button type="button" onClick={this.showModal}>
-         Upload 
-         </button>
+	</div>
+	);
+    /*
+          <br />
+          <font size="1">(below is just temp - enter an imageId to get that image)</font>
           <form onSubmit={this.setImage}>
           <input type="text" onChange={this.handleNewImageChange} />
           <input type="submit" value="submit" />
           </form>
-	</div>
-	);
+          */
     }
 }
 
@@ -313,10 +336,8 @@ const Modal = ({ handleClose, fetchdata, handleFileChange, handleUpload, show, c
 
   return(
     <div className={showHideClassName}>
-    <section className="modal-main">
     {children}
-    <button onClick={handleClose}>close</button>
-    </section>
+    <button onClick={handleClose} className="modal-button">close</button>
     </div>
   );
 };
@@ -364,7 +385,7 @@ class AddAnswer extends Component {
           } else {
             this.setState( { warning : '' } );
           }
-	  this.props.refresh();
+	//  this.props.refresh();
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
@@ -398,10 +419,13 @@ class AddAnswer extends Component {
       <div ref={this.myRef} className="Answer-box">
       {this.renderWarning()}
       <div>What is it?</div>
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} className="Answer-box">
       <input type="text" onChange={this.handleChange} id="answerbox"/>
       <input type="submit" value="Submit Answer" />
       </form>
+      <button type="button" onClick={this.showModal} className="Answer-box">
+      Upload New Image
+      </button>
       </div>
     );
   }

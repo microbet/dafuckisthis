@@ -28,7 +28,7 @@ class Login extends Component {
     .then((data) => {
       this.props.user.setUser(data.username, data.userId, data.sessioncode);
       cookie.save("sessioncode", data.sessioncode, { path: '/', maxAge: 300000 });	  
-	  this.props.refresh();
+	//  this.props.refresh();
     })
     .catch((error) => {
       console.log("error ", error);

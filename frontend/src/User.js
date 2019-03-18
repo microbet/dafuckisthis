@@ -1,11 +1,12 @@
-import { Component } from 'react';
+//import { Component } from 'react';
 
-class User extends Component {
+class User {
 
   constructor() {
-    super();
+ //   super();
     this.userId = 0;
     this.username = '';
+    this.imageId = 0;
   }
 
   setUser(username, userId, sessionvalue) {
@@ -14,8 +15,16 @@ class User extends Component {
     this.sessionvalue = sessionvalue;
   }
 
+  setImageId(imageId) {
+    this.imageId = imageId;
+  }
+
   getUserId = () => {
     return this.userId;
+  }
+
+  getImageId = () => {
+    return this.imageId;
   }
 }
 

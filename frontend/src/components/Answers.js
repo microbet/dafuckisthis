@@ -13,14 +13,18 @@ class Answers extends Component {
 		  mostVotedAnswerBatch : 0,
       most : 'netUp',
       scrollTimer : true,
-      userId : this.props.user.userId,
+    //  userId : this.props.user.userId,
     }
   }
 
   componentDidMount() {
 //    document.getElementById('answerBox').addEventListener('scroll', this.handleScroll);
-    this.fetchData();
-	  this.fetchMost(this.state.most);
+    if (this.props.user.imageId) {
+      // did this happen and with what image id when you first hit most answered
+      console.log("what imageid = ", this.props.user.imageId);
+      this.fetchData();
+      this.fetchMost(this.state.most);
+    }
   }
 
   componentWillUnmount() {
@@ -29,8 +33,10 @@ class Answers extends Component {
   }
   
   componentWillReceiveProps(answerToggle) {
+    if (this.props.imageId) {
 	  this.fetchData();
 	  this.fetchMost(this.state.most); // this should probably be set in state
+    }
   }
 
   fetchMost(type) {
@@ -125,11 +131,11 @@ class Answers extends Component {
         if (data.response === 'done') {
           // do something to the next or previous button here
           if (direction === 'next') {
-            document.getElementById('nextMainImage').setAttribute("style", "background-color: #333333;");
+            document.getElementById('nextMainImage').setAttribute("style", "background-color: #636363;");
             document.getElementById('nextMainImage').setAttribute("disabled", "true;");
           }
           if (direction === 'previous') {
-            document.getElementById('previousMainImage').setAttribute("style", "background-color: #333333;");
+            document.getElementById('previousMainImage').setAttribute("style", "background-color: #636363;");
             document.getElementById('previousMainImage').setAttribute("disabled", "true;");
           }
           return null;
@@ -279,7 +285,7 @@ class Answers extends Component {
       if (this.state.answerBatch.length > 0) {
         this.state.answerBatch.forEach((element) => {
            display.push(
-             <ul key={element[1]}>{element[0]}
+             <ul key={element[1]} className="Answer-list">{element[0]}
              <div onClick={this.handleUlClick} thisanswerid={element[1]} vote="up"
 				key={element[1] + 'upvote'}>{ this.props.user.userId ? "thumbup " : null }</div>
 				<div> { element[2] } up</div>
@@ -308,10 +314,11 @@ class Answers extends Component {
 	}
 	
     return(
-	<div>
+	<div className="Answer-box"><center>
       <button onClick={() => {this.fetchAnswer(this.state.oldestAnswerId, this.props.imageId, 'next')}} id="nextMainImage">Next</button>
       <button onClick={() => {this.fetchAnswer(this.state.newestAnswerId, this.props.imageId, 'previous')}} id="previousMainImage">Previous</button>
-          <div className="answerBox" id="answerBox">
+      </center>
+          <div className="Answer-box1" id="answerBox">
           { display }
 		  </div>
 			<br />

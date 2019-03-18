@@ -39,7 +39,7 @@ class Leaderboard extends Component {
     <br />
     Now I should be able to get an answer component down here with the right
     answers
-    { this.state.mostCommented ? <Answers imageId={this.state.mostCommented} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} refresh={this.props.refresh} answerToggle={this.props.answerToggle} /> : null }
+    { this.state.mostCommented ? <Answers imageId={this.state.mostCommented} DATA_URI={this.props.DATA_URI} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} user={this.props.user} } answerToggle={this.props.answerToggle} /> : null }
 	</div>
 	);
     }

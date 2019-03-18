@@ -1,39 +1,50 @@
 import React, { Component } from 'react';
+import './App.css';
 import MainPic from './components/MainPic';
 import Login from './components/Login';
 import Answers from './components/Answers';
 import Register from './components/Register';
 import User from './User';
-import './App.css';
+import Image from './Image';
 // import Leaderboard from './components/Leaderboard';
 // I think I need to move all the components into here if I'm going to move them around
 // based on window size
 
-const DATA_URI = 'http://173.255.247.69:5000';
+var DATA_URI = '';
+if (process.env.NODE_ENV === 'development') {
+  DATA_URI = 'http://127.0.0.1:5000';
+}
+
+if (process.env.NODE_ENV === 'production') {
+  DATA_URI = 'http://173.255.247.69:5000';
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
     var user = new User();
+    var image = new Image();
     this.state = {
       user : user,
+      image : image,
+      loading : 'initial',
       answerToggle : 0,
       showLogin : true,
-      appClass : 'App',
     }
   }
 
   componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
+    // needs work
+   // if (!this.state.image.imageId) {
+    this.setState({ loading : 'true' });
+    this.state.image.requestImage('latest', DATA_URI).then(() => {
+      this.setState( { loading : 'false' });
+    })
+   // }
   }
 
-  handleResize = () => {
-    if (window.innerWidth < 1000) {
-      this.setState({ appClass : "Narrow-format" });
-    } else {
-      this.setState({ appClass : "Wide-format" });
-    }
+  setImage = (imageId) => {
+    this.setState({ imageId : imageId });
   }
 
   refresh = () => {
@@ -54,18 +65,30 @@ class App extends Component {
   }
 
   render() {
+
+    if (this.state.loading === 'initial') {
+      return <h2>Intializing...</h2>;
+    }
+
+
+    if (this.state.loading === 'true') {
+      return <h2>Loading...</h2>;
+    }
 			 // <Leaderboard DATA_URI={DATA_URI} user={this.state.user} />
     return (
-      <div className={this.state.appClass}>
-      { this.state.showLogin ? <Login DATA_URI={DATA_URI} user={this.state.user} switchForm={this.switchForm} refresh={this.refresh} /> 
+      <div className="wrapper">
+        <div>
+      { this.state.showLogin ? <Login DATA_URI={DATA_URI} user={this.state.user} switchForm={this.switchForm} /> 
         :
-        <Register DATA_URI={DATA_URI} switchForm={this.switchForm} refresh={this.refresh} /> }
+        <Register DATA_URI={DATA_URI} switchForm={this.switchForm} /> }
+        </div>
+        <div>
+	   <MainPic DATA_URI={DATA_URI} setImage={this.setImage} selectedImage='latest' user={this.state.user} answerToggle={this.state.answerToggle} />
 
-	   <MainPic DATA_URI={DATA_URI} selectedImage='latest' user={this.state.user} refresh={this.refresh} answerToggle={this.state.answerToggle} />
-
-
-
-
+        </div>
+        <div>
+      { this.state.image && <Answers imageId={this.state.user.imageId} DATA_URI={DATA_URI} user={this.state.user} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} answerToggle={this.props.answerToggle} />  }
+        </div>
       </div>
     );
   }
