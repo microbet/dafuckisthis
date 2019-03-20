@@ -97,7 +97,7 @@ class MainPic extends Component {
       } );
       // maybe this shouldn't be set yet?
       // I think it's causing a refresh and closing the modal?
-       this.props.user.setImageId(data.image_id);
+       this.props.image.setImageId(data.image_id);
     })
     .catch((error) => { 
       this.setState( { warning : 'There was a problem uploading the file' } );
@@ -107,7 +107,7 @@ class MainPic extends Component {
   handleCaption = () => {
     const fd = new FormData();
     fd.append('caption', this.state.caption);
-    fd.append('imageId', this.props.user.imageId);
+    fd.append('imageId', this.props.image.imageId);
     fetch( this.props.DATA_URI + '/caption', {
       method: 'POST',
       headers: {
@@ -127,7 +127,7 @@ class MainPic extends Component {
   }
 
   fetchData(msg='') {
-    fetch( this.props.DATA_URI + "/get_image?imageId=" + this.props.user.imageId
+    fetch( this.props.DATA_URI + "/get_image?imageId=" + this.props.image.imageId
        + "&selected_image=" + this.state.selectedImage + "&user_id=" 
        + this.props.user.userId + "&sessionvalue=" + this.props.user.sessionvalue, {
       credentials : 'same-origin',
@@ -142,7 +142,8 @@ class MainPic extends Component {
              flaskMessage : data.message,
   //           imageId : data.image_id,
            })
-           this.props.user.setImageId(data.image_id);
+           this.props.image.setImageId(data.image_id);
+           this.props.refresh();
            if (data.imagePosition === 'last') {
              this.setState( { showNext : false, showPrev : true } );
            } else if (data.imagePosition === 'first') {
@@ -210,7 +211,7 @@ class MainPic extends Component {
     // need to get the next or previous from that user
     // so need to send something more to api
     if (this.state.selectedImage === 'user') { direction = "user_" + direction; }
-    fetch( this.props.DATA_URI + '/get_image?imageId='+this.props.user.imageId+
+    fetch( this.props.DATA_URI + '/get_image?imageId='+this.props.image.imageId+
       '&selected_image=' + direction + "&user_id=" + this.props.user.userId 
       + "&sessionvalue=" + this.props.user.sessionvalue, {
       method: 'GET',
@@ -230,8 +231,8 @@ class MainPic extends Component {
              flaskMessage : data.message,
            //  imageId : data.image_id,
         })
-        this.props.user.setImageId(data.image_id);
-      //  this.props.refresh();
+        this.props.image.setImageId(data.image_id);
+        this.props.refresh();
         if (data.imagePosition === 'last') {
           this.setState( { showNext : false, showPrev : true } );
 
@@ -267,7 +268,7 @@ class MainPic extends Component {
 
   setImage = (event) => {
     event.preventDefault();
-    this.props.user.setImageId(this.state.newImageId);
+    this.props.image.setImageId(this.state.newImageId);
     this.setState({ selectedImage : '' }, () => this.fetchData());
   }
 
@@ -312,7 +313,7 @@ class MainPic extends Component {
 		{ this.state.mainPicCaption }
   </span>
         <br />
-         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} imageId={this.props.user.imageId} triggerAnswers={this.triggerAnswers}/>
+         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} refresh={this.props.refresh} imageId={this.props.image.imageId} triggerAnswers={this.triggerAnswers}/>
          <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
                   {this.renderCaption()}
@@ -385,10 +386,10 @@ class AddAnswer extends Component {
           } else {
             this.setState( { warning : '' } );
           }
-	//  this.props.refresh();
+          this.props.refresh();
     })
     .catch((error) => { 
-      this.setState( { warning : 'There was a problem uploading the file' } );
+      this.setState( { warning : 'There was a problem submitting the answer.' } );
 	  console.log(error);
     });
   }

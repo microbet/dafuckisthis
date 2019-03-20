@@ -33,6 +33,10 @@ class Image {
     return promise;
   }
 
+   setImageId(imageId) {
+    this.imageId = imageId;
+  }
+
 }
 
 export default Image 

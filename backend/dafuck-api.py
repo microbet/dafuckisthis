@@ -171,13 +171,14 @@ def answer():
         cursor.execute(sql, (request.form['imageId'], request.form['answer'], 
             request.form['user_id']))
     else:
-        sql = ("INSERT INTO answer VALUES ('', %s, %s, 0, 0, 0)")
+        sql = ("INSERT INTO answer VALUES (NULL, %s, %s, 0, 0, 0)")
         print("sql is ", sql)
         print("imageId is ", request.form['imageId'])
         print("answer is ", request.form['answer'])
         cursor.execute(sql, (request.form['imageId'], request.form['answer'])) 
     sql = "UPDATE imagemetadata SET answer_count=answer_count+1 WHERE \
-           image_id = %s"
+           image_id=%s"
+    print("sql second time is ", sql)
     cursor.execute(sql, (request.form['imageId'],))
     conn.commit()
     conn.close()

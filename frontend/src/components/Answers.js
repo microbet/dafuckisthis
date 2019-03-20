@@ -19,12 +19,12 @@ class Answers extends Component {
 
   componentDidMount() {
 //    document.getElementById('answerBox').addEventListener('scroll', this.handleScroll);
-    if (this.props.user.imageId) {
+   // if (this.props.image.imageId) {
       // did this happen and with what image id when you first hit most answered
-      console.log("what imageid = ", this.props.user.imageId);
+    //  console.log("what imageid = ", this.props.image.imageId);
       this.fetchData();
       this.fetchMost(this.state.most);
-    }
+   // }
   }
 
   componentWillUnmount() {
@@ -33,7 +33,7 @@ class Answers extends Component {
   }
   
   componentWillReceiveProps(answerToggle) {
-    if (this.props.imageId) {
+    if (this.props.image.imageId) {
 	  this.fetchData();
 	  this.fetchMost(this.state.most); // this should probably be set in state
     }
@@ -47,7 +47,7 @@ class Answers extends Component {
     if (type === 'mostDown') { endpoint = '/get_most_downvoted'; }
     if (type === 'most') { endpoint = '/get_most_voted'; }
 	  let retArr = [];
-	  fetch( this.props.DATA_URI + endpoint + "?imageId=" + this.props.imageId, {
+	  fetch( this.props.DATA_URI + endpoint + "?imageId=" + this.props.image.imageId, {
 		  method: 'GET',
 		  headers: { 'Accept': 'application/json' },
 		  credentials: 'same-origin',
@@ -67,7 +67,7 @@ class Answers extends Component {
   
   fetchData() {
     let retArr = [];
-    fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.imageId + "&answerId=" + 0, { 
+    fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.image.imageId + "&answerId=" + 0, { 
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -270,9 +270,9 @@ class Answers extends Component {
 
   handleScroll = (event) => {
      if (document.getElementById('answerBox').scrollHeight - document.getElementById('answerBox').offsetHeight === document.getElementById('answerBox').scrollTop) {
-       this.fetchAnswer(this.state.oldestAnswerId, this.props.imageId, 'next');
+       this.fetchAnswer(this.state.oldestAnswerId, this.props.image.imageId, 'next');
      } else if (document.getElementById('answerBox').scrollTop === 0) {
-       this.fetchAnswer(this.state.newestAnswerId, this.props.imageId, 'previous');
+       this.fetchAnswer(this.state.newestAnswerId, this.props.image.imageId, 'previous');
      } else {
        clearInterval(this.timer);
        this.setState( { scrollTimer : true } );
@@ -315,8 +315,8 @@ class Answers extends Component {
 	
     return(
 	<div className="Answer-box"><center>
-      <button onClick={() => {this.fetchAnswer(this.state.oldestAnswerId, this.props.imageId, 'next')}} id="nextMainImage">Next</button>
-      <button onClick={() => {this.fetchAnswer(this.state.newestAnswerId, this.props.imageId, 'previous')}} id="previousMainImage">Previous</button>
+      <button onClick={() => {this.fetchAnswer(this.state.oldestAnswerId, this.props.image.imageId, 'next')}} id="nextMainImage">Next</button>
+      <button onClick={() => {this.fetchAnswer(this.state.newestAnswerId, this.props.image.imageId, 'previous')}} id="previousMainImage">Previous</button>
       </center>
           <div className="Answer-box1" id="answerBox">
           { display }

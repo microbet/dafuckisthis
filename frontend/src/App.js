@@ -44,10 +44,12 @@ class App extends Component {
   }
 
   setImage = (imageId) => {
-    this.setState({ imageId : imageId });
+    this.state.image.setImageId(imageId);
+   // this.setState({ image : imageId : imageId });
   }
 
   refresh = () => {
+    this.setState( { image : this.state.image } );
 	if (this.state.answerToggle === 0) {
 		this.setState({ answerToggle : 1 });
 	} else {
@@ -83,11 +85,11 @@ class App extends Component {
         <Register DATA_URI={DATA_URI} switchForm={this.switchForm} /> }
         </div>
         <div>
-	   <MainPic DATA_URI={DATA_URI} setImage={this.setImage} selectedImage='latest' user={this.state.user} answerToggle={this.state.answerToggle} />
+	   <MainPic DATA_URI={DATA_URI} image={this.state.image} setImage={this.setImage} selectedImage='latest' user={this.state.user} answerToggle={this.state.answerToggle} refresh={this.refresh}/>
 
         </div>
         <div>
-      { this.state.image && <Answers imageId={this.state.user.imageId} DATA_URI={DATA_URI} user={this.state.user} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} answerToggle={this.props.answerToggle} />  }
+      { this.state.image.imageId && <Answers image={this.state.image} DATA_URI={DATA_URI} user={this.state.user} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} answerToggle={this.state.answerToggle} />  }
         </div>
       </div>
     );
