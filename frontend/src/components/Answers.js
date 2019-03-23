@@ -66,6 +66,7 @@ class Answers extends Component {
   }
   
   fetchData() {
+    this.clearNextPrevBackground();
     let retArr = [];
     fetch( this.props.DATA_URI + "/get_answers?imageId=" + this.props.image.imageId + "&answerId=" + 0, { 
       method: 'GET',
@@ -116,6 +117,12 @@ class Answers extends Component {
   }
 }
 
+  clearNextPrevBackground() {
+    document.getElementById('previousMainImage').setAttribute("style", "background-color: null;");
+    document.getElementById('nextMainImage').setAttribute("style", "background-color: null;");
+    document.getElementById('previousMainImage').removeAttribute("disabled", "true;");
+    document.getElementById('nextMainImage').removeAttribute("disabled", "true;");
+  }
 
   // dunno if this should be a separate function from fetchData or not, maybe combine later
   fetchAnswer(answerId, imageId, direction) {   // (direction is 'next' or 'previous'
@@ -140,10 +147,7 @@ class Answers extends Component {
           }
           return null;
         } else {
-          document.getElementById('previousMainImage').setAttribute("style", "background-color: null;");
-          document.getElementById('nextMainImage').setAttribute("style", "background-color: null;");
-          document.getElementById('previousMainImage').removeAttribute("disabled", "true;");
-          document.getElementById('nextMainImage').removeAttribute("disabled", "true;");
+          this.clearNextPrevBackground();
         }
 
 	      let tempArr = this.state.answerBatch;
