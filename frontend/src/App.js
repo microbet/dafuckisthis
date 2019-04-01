@@ -11,11 +11,11 @@ import Image from './Image';
 // based on window size
 
 var DATA_URI = '';
-if (process.env.NODE_ENV === 'development') {
+if (window.location.host === 'localhost:3000') {
   DATA_URI = 'http://127.0.0.1:5000';
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (window.location.host === 'www.dafuckisthat.com') {
   DATA_URI = 'http://173.255.247.69:5000';
 }
 

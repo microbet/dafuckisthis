@@ -15,6 +15,12 @@ class User {
     this.sessionvalue = sessionvalue;
   }
 
+  unsetUser() {
+    this.username = '';
+    this.userId = 0;
+    this.imageId = 0;
+  }
+
   setImageId(imageId) {
     this.imageId = imageId;
   }

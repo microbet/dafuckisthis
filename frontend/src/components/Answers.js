@@ -235,9 +235,9 @@ class Answers extends Component {
         body: fd
       })
       .then(response => response.json())
-	  .then(data => {
-		  this.buildBatch(data['answer_id'], data['up'], data['down'])
-	  })
+      .then(data => {
+        this.buildBatch(data['answer_id'], data['up'], data['down'])
+      })
       .catch(error => {
         console.log("error: ", error);
       });
@@ -289,18 +289,18 @@ class Answers extends Component {
       if (this.state.answerBatch.length > 0) {
         this.state.answerBatch.forEach((element) => {
            display.push(
-             <ul key={element[1]} className="Answer-list">{element[0]}
-             <div onClick={this.handleUlClick} thisanswerid={element[1]} vote="up"
-				key={element[1] + 'upvote'}>{ this.props.user.userId ? "thumbup " : null }</div>
-				<div> { element[2] } up</div>
-			<div onClick={this.handleUlClick} thisanswerid={element[1]} vote='down'
-				key={element[1] + 'downvote'}>{ this.props.user.userId ? "thumbdown " : null }</div>
-				<div> { element[3] } down</div>	
+             <ul key={element[1]} className="Answer-list"><span className="The-Answer">"{element[0]}"</span>
+             <span className="Up-Answer" onClick={this.handleUlClick} thisanswerid={element[1]} vote="up"
+				key={element[1] + 'upvote'}>{ this.props.user.userId ? "thumbup " : null }</span>
+				<span className="Up-Answer2"> { element[2] } up</span>
+			<span className="Down-Answer" onClick={this.handleUlClick} thisanswerid={element[1]} vote='down'
+				key={element[1] + 'downvote'}>{ this.props.user.userId ? "thumbdown " : null }</span>
+				<span className="Down-Answer2"> { element[3] } down</span>	
              </ul>);
         });
       }
     }
-	let mostVotedDisplay = []
+    let mostVotedDisplay = []
 	if (Array.isArray(this.state.mostVotedAnswerBatch)) {
 		if (this.state.mostVotedAnswerBatch.length > 0) {
 			this.state.mostVotedAnswerBatch.forEach((element) => {

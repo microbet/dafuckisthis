@@ -88,6 +88,7 @@ class MainPic extends Component {
       // it should probably ask the user if it's ok
       // maybe the image should even be saved in a temp dir
       // and then moved when user says ok
+      console.log("data is ", data);
       this.setState( { 
         showFileUpload : false,
         showCaption : true,
@@ -313,7 +314,7 @@ class MainPic extends Component {
 		{ this.state.mainPicCaption }
   </span>
         <br />
-         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} refresh={this.props.refresh} imageId={this.props.image.imageId} triggerAnswers={this.triggerAnswers}/>
+         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} refresh={this.props.refresh} imageId={this.props.image.imageId} triggerAnswers={this.triggerAnswers} showModal={this.showModal}/>
          <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
                   {this.renderFileUpload()}
                   {this.renderCaption()}
@@ -424,7 +425,7 @@ class AddAnswer extends Component {
       <input type="text" onChange={this.handleChange} id="answerbox"/>
       <input type="submit" value="Submit Answer" />
       </form>
-      <button type="button" onClick={this.showModal} className="Answer-box">
+      <button type="button" onClick={this.props.showModal} className="Answer-box">
       Upload New Image
       </button>
       </div>

@@ -99,6 +99,27 @@
   color: #333333;
 }
 
+.Small-form input[type=password] {
+  width: 30%;
+  max-width: 200px;
+  min-width: 100px;
+  padding: 0px 3px;
+  margin: 4px 4px;
+  display: inline-block;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 13px;
+  color: #333333;
+}
+
+.welcome {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding-left: 10px;
+}
+
 .Small-form input[type=submit] {
   border: none;
   background-color: #999;
@@ -141,17 +162,24 @@
 }
 
 .Answer-list {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
   background-color: #ffffff;
   margin-top: 0;
   margin-bottom: 0;
   padding: 0;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 100px;
+  padding-right: 100px;
+}
+
+.The-Answer {
+  width: 60%;
 }
 
 .Answer-box1 {
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
   background-color: #ffffff;
   overflow-x: hidden;
 }

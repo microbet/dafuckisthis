@@ -54,28 +54,19 @@ def upload_image():
     if file.filename == '':
         flash('No file selected')
         return jsonify({'message' : 'No file selected'})
-    
-    print(file)
-    print(file.filename)
-    print(allowed_file(file.filename))
     if file and allowed_file(file.filename):
-        print("why")
         # shouldn't always have user_id=1
         if valid_user(request.form['user_id'], request.form['sessionvalue']):
-            print("hi ")
             user_id = request.form['user_id']
         else:
-            print("hi di")
             user_id=0
-        print("hi di do")
-        cursor.execute("INSERT INTO imagemetadata VALUES ('', '', %s, %s, 0)", 
+        cursor.execute("INSERT INTO imagemetadata VALUES (null, '', %s, %s, 0)", 
                        (caption, user_id))
         conn.commit()
         image_id = cursor.lastrowid
         filename = str(image_id) + '_' + secure_filename(file.filename)
         cursor.execute("UPDATE imagemetadata SET filename=%s WHERE \
                 image_id=%s", (filename, image_id)) 
-        print("hi ", filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         #this might be able to be done to stream
         image = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], 
@@ -131,7 +122,7 @@ def register():
     cursor = conn.cursor()
     first_hash = generate_password_hash(request.form['password'])
     cursor.execute("INSERT INTO user (user_id, username, password_hash) \
-            VALUES ('', %s, %s)", (request.form['username'], first_hash))
+            VALUES (null, %s, %s)", (request.form['username'], first_hash))
     conn.commit()
     conn.close()
 
@@ -167,18 +158,14 @@ def answer():
         data = {'error' : 'No answer was received'}
         return jsonify(data)
     if valid_user(request.form['user_id'], request.form['sessionvalue']):
-        sql = ("INSERT INTO answer VALUES ('', %s, %s, %s, 0, 0)")
+        sql = ("INSERT INTO answer VALUES (null, %s, %s, %s, 0, 0)")
         cursor.execute(sql, (request.form['imageId'], request.form['answer'], 
             request.form['user_id']))
     else:
         sql = ("INSERT INTO answer VALUES (NULL, %s, %s, 0, 0, 0)")
-        print("sql is ", sql)
-        print("imageId is ", request.form['imageId'])
-        print("answer is ", request.form['answer'])
         cursor.execute(sql, (request.form['imageId'], request.form['answer'])) 
     sql = "UPDATE imagemetadata SET answer_count=answer_count+1 WHERE \
            image_id=%s"
-    print("sql second time is ", sql)
     cursor.execute(sql, (request.form['imageId'],))
     conn.commit()
     conn.close()
@@ -426,9 +413,7 @@ def get_answer():
                      'up' : row[2], 'down' : row[3]})
     else:
        res = { 'response' : 'done' }
-       print("res is ", res)
        return jsonify(res)
-    print("data is ", data)
     conn.close()
     return jsonify(data)
 
@@ -485,7 +470,7 @@ def vote():
                 cursor.execute(sql, (request.form['answer_id'],))
                 conn.commit()
         else:
-            sql = ("INSERT INTO user_answer VALUES ('', %s, %s, %s)")
+            sql = ("INSERT INTO user_answer VALUES (null, %s, %s, %s)")
             cursor.execute(sql, (request.form['user_id'], request.form['answer_id'],
                 request.form['vote']))
             conn.commit()
