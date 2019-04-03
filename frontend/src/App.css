@@ -49,7 +49,6 @@
 
 .Wrapper {
   text-align: center;
-  background-color: #ffffff;
   justify-content: space-between;
   display: flex;
   flex-direction: row;
@@ -61,7 +60,6 @@
 }
 
 .App button {
-  background-color: #ffffff;
   color: #333333;
   border: none;
   text-decoration: underline;
@@ -169,19 +167,37 @@
   margin-top: 0;
   margin-bottom: 0;
   padding: 0;
-  padding-left: 100px;
-  padding-right: 100px;
+  padding-left: 1%;
+  padding-right: 1%;
+  padding-bottom: 30px;
+  width: 100%;
 }
 
 .The-Answer {
-  width: 60%;
+  width: 46%;
+}
+
+.Up-Answer {
+  width: 10%;
+}
+
+.Up-Answer2 {
+  width: 10%;
+}
+
+.Down-Answer {
+  width: 10%;
+}
+
+.Down-Answer2 {
+  width: 10%;
 }
 
 .Answer-box1 {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
   overflow-x: hidden;
+  width: 100%;
 }
 
 .Answer-box input[type=text] {
