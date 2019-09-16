@@ -8,6 +8,14 @@
   background-color: #7e8aab;
 }
 
+p {
+  margin: 1em;
+}
+
+h3 {
+  margin: 1em;
+}
+
 .Pic-wide {
   display: flex;
   flex-direction: column;
@@ -26,6 +34,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.HLWrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.HLBorder {
+  display: flex;
+  width: 10%;
+}
+
+.Highlight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ff9999;
+  width: 80%;
+}
+
+.warning {
+  color: red;
 }
 
 .Wide-format button {
@@ -72,18 +102,56 @@
   color: #61dafb;
 }
 
+.Login-form {
+  display: flex;
+  font-size: 13px;
+  align-items: center;
+  margin: 0px auto;
+  width: 95%;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .Small-form {
   color: #333333;
   display: flex;
   font-size: 13px;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   margin: 0px auto;
   width: 95%;
   justify-content: center;
 }
 
+.Login-form input[type=text] {
+  width: 30%;
+  max-width: 200px;
+  min-width: 100px;
+  padding: 0px 3px;
+  margin: 4px 4px;
+  display: inline-block;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 13px;
+  color: #333333;
+}
+
 .Small-form input[type=text] {
+  width: 30%;
+  max-width: 200px;
+  min-width: 100px;
+  padding: 0px 3px;
+  margin: 4px 4px;
+  display: inline-block;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 13px;
+  color: #333333;
+}
+
+.Login-form input[type=password] {
   width: 30%;
   max-width: 200px;
   min-width: 100px;
@@ -111,6 +179,26 @@
   color: #333333;
 }
 
+.Form-row {
+  width: 250px;
+  display: flex;
+  align-content: space-between;
+  flex-direction: row;
+}
+
+.Form-col-one {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.Form-col-two {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  flex-grow: 2;
+}
+
 .welcome {
   display: flex;
   flex-direction: row;
@@ -130,6 +218,18 @@
   cursor: pointer;
 }
 
+.Login-form input[type=submit] {
+  border: none;
+  background-color: #999;
+  border-radius: 8px;
+  color: white;
+  padding: 1px 6px;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
 .Text-button {
   background: none;
   border: none;
@@ -138,13 +238,69 @@
   cursor: pointer;
 }
 
-.Main-image {
+.Core-window {
   display: flex;
+  flex-direction: column;
   width: 100%;
-  height: 400px;
   align-items: center;
   justify-content: center;
   background-color: #7e8aab;
+}
+
+.Lower-core {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  justify-content: space-around;
+}
+
+.Core-window1 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: #7e8aab;
+  padding: 10px;
+}
+
+.Core-window2 {
+  height: 900px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: center;
+  background-color: #7e8aab;
+}
+
+.parent {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+}
+
+.Core-window-main {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  justify-content: space-around;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  justify-content: space-around;
+}
+
+.active {
+  background-color: #0099FF;
+}
+
+.Login-link .active {
+  background-color: #FFFFFF;
+  text-decoration: none;
 }
 
 .Answer-box {
@@ -178,6 +334,7 @@
 }
 
 .Up-Answer {
+  font-size: 12px;
   width: 10%;
 }
 
@@ -186,6 +343,7 @@
 }
 
 .Down-Answer {
+  font-size: 12px;
   width: 10%;
 }
 

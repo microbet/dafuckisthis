@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './MainPic.css';
 
-class MainPic extends Component {
+class Core extends Component {
   constructor(props){
     super(props);
     this.state = {
+      page: "home",
       show: false,
       isLoading: true,
       mainPicPath : '',
@@ -30,7 +30,7 @@ class MainPic extends Component {
   }
 
   componentDidMount() {
-    this.fetchData();
+  //  this.fetchData();
     this.handleResize();
     window.addEventListener('resize', this.handleResize);
   }
@@ -261,6 +261,8 @@ class MainPic extends Component {
     if (type === 'user') {
       this.setState( { selectedImage : 'user' }, () => this.fetchData());
     }
+    // this needs to refresh answers
+    this.props.refresh();
   }
 
   handleNewImageChange = event => {
@@ -273,10 +275,22 @@ class MainPic extends Component {
     this.setState({ selectedImage : '' }, () => this.fetchData());
   }
 
+  navigate(place) {
+    console.log("Place is ", place);
+  }
 
   render() {
    // console.log(window.document.getElementsByTagName('body')[0].clientWidth);
   //  console.log(window.document.getElementsByTagName('body'));
+    //
+    //
+    // Maybe I can make a navigation tree here where I make arrays of arrays where 
+    // the main window shows you the elements of the array you have navigated to
+    // the windown on the left shows you the parent.  If you are at the first element
+    // it's one big window.
+    // each element could be a component
+    //
+    //
     var caption = {
       fontWeight : 'normal',
       fontSize : '16px',
@@ -296,40 +310,46 @@ class MainPic extends Component {
   <line x1="15" y1="5" x2="5" y2="0" stroke="#000000" strokeWidth="2" />
   <line x1="15" y1="5" x2="5" y2="10" stroke="#000000" strokeWidth="2" />
 </svg>;
-
+    /*
 	return(
-	<div className={this.state.appClass}>
-          <div className={this.state.picNav}>
-          <button onClick={() => {this.sortPic('latest')}}>Most Recent</button>
-            <button onClick={() => {this.sortPic('mostAnswers')}}>Most Answers</button>
-      { (this.props.user.userId && (this.state.selectedImage !== 'user')) ? <button onClick={() => {this.sortPic('user')}}>Your Pics</button> : null }
-      { (this.props.user.userId && (this.state.selectedImage === 'user')) ? <button onClick={() => {this.sortPic('user')}}>All Pics</button> : null }
-              <br />
-          { this.state.showPrev ? <span>{leftArrow}<button onClick={() => {this.handlePrevOrNext('previous')}}>Prev</button>&nbsp;&nbsp;&nbsp;</span> : null }  { this.state.showNext ? <span>&nbsp;&nbsp;&nbsp;<button onClick={() => {this.handlePrevOrNext('next')}}>Next</button>{rightArrow}</span> : null }
+	<div className="Core-window">
+          <p>Welcome to HelpYourselfSolar.com where you can get the best solar system at the best prices!</p>
+          <div className="Lower-core">
+            <span>Get Started</span>
+            <span><button onClick={() => this.navigate("learn")}>Learn More</button></span>
           </div>
-          <div className="Main-image">
-          {this.state.mainPicPath && <img src={ this.props.DATA_URI + this.state.mainPicPath } alt='whatisthis' />}<br /> 
-          </div>
-          <span style={caption}>
-		{ this.state.mainPicCaption }
-  </span>
-        <br />
-         <AddAnswer DATA_URI={this.props.DATA_URI} user={this.props.user} refresh={this.props.refresh} imageId={this.props.image.imageId} triggerAnswers={this.triggerAnswers} showModal={this.showModal}/>
-         <Modal show={this.state.show} handleClose={this.hideModal} fetchdata={this.fetchdata} handleFileChange={this.handleFileChange} handleUpload={this.handleUpload} >
-                  {this.renderFileUpload()}
-                  {this.renderCaption()}
-                  {this.previewPic()}
-          </Modal>
 	</div>
 	);
-    /*
-          <br />
-          <font size="1">(below is just temp - enter an imageId to get that image)</font>
-          <form onSubmit={this.setImage}>
-          <input type="text" onChange={this.handleNewImageChange} />
-          <input type="submit" value="submit" />
-          </form>
-          */
+        */
+    // thinking about defining a navigation object 
+  var navigationObj =  {};
+  navigationObj.home = ["about solar", "about helpyourselfsolar"];
+  console.log("page is ", this.state.page);
+  console.log("is the page  = ", navigationObj[this.state.page][0]);
+    //
+    //  can I do that and include the name of the component?
+    //      `
+                        
+        return(
+          <div className="Core-window1">
+            <div className="breadcrumb">
+              Here -> is -> the -> breadcrumb -> navigation
+            </div>
+            <div className="Core-window2">
+              <div className="parent">
+                <p>Welcome to HelpYourselfSolar.com where you can get the best solar system at the best prices!</p>
+                <div className="Lower-core">
+                  <span>Get Started</span>
+                  <span><button onClick={() => this.navigate("learn")}>Learn More</button></span>
+                </div>
+              </div>
+              <div className="Core-window-main">
+                <span>About How Solar Works?</span>
+                <span>About How HelpYourselfSolar Works?</span>
+              </div>
+            </div>
+          </div>
+	);
     }
 }
 
@@ -348,7 +368,7 @@ const container = document.createElement('div');
 document.body.appendChild(container);
 // ReactDOM.render(<App />, container);
 
-export default MainPic
+export default Core 
 
 class AddAnswer extends Component {
 

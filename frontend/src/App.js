@@ -1,21 +1,26 @@
 import React, { Component } from 'react';
 import './App.css';
-import MainPic from './components/MainPic';
+import {
+  Route,
+  NavLink,
+  HashRouter,
+  Redirect,
+} from "react-router-dom";
+import Home from "./Home";
+import About from "./components/About";
+import HowSolar from "./components/HowSolar";
+import HowHelpYourself from "./components/HowHelpYourself";
+import GetStarted from "./components/GetStarted";
 import Login from './components/Login';
-import Answers from './components/Answers';
 import Register from './components/Register';
 import User from './User';
-import Image from './Image';
-// import Leaderboard from './components/Leaderboard';
-// I think I need to move all the components into here if I'm going to move them around
-// based on window size
 
 var DATA_URI = '';
 if (window.location.host === 'localhost:3000') {
   DATA_URI = 'http://127.0.0.1:5000';
 }
 
-if (window.location.host === 'www.dafuckisthat.com') {
+if (window.location.host === 'www.helpyourselfsolar.com') {
   DATA_URI = 'http://173.255.247.69:5000';
 }
 
@@ -23,73 +28,73 @@ class App extends Component {
   constructor(props) {
     super(props);
     var user = new User();
-    var image = new Image();
     this.state = {
       user : user,
-      image : image,
-      loading : 'initial',
-      answerToggle : 0,
+      loading : 'true',
       showLogin : true,
+      getStarted : 1,
+      redirect : true,
     }
-  }
-
-  componentDidMount() {
-    // needs work
-   // if (!this.state.image.imageId) {
-    this.setState({ loading : 'true' });
-    this.state.image.requestImage('latest', DATA_URI).then(() => {
-      this.setState( { loading : 'false' });
-    })
-   // }
-  }
-
-  setImage = (imageId) => {
-    this.state.image.setImageId(imageId);
-   // this.setState({ image : imageId : imageId });
-  }
-
-  refresh = () => {
-    this.setState( { image : this.state.image } );
-	if (this.state.answerToggle === 0) {
-		this.setState({ answerToggle : 1 });
-	} else {
-		this.setState({ answerToggle : 0 });
-	}
   }
 
   switchForm = (show) => {
     if (show === 'register') {
       this.setState({ showLogin : false });
     }
-    if (show === 'login') {
+  if (show === 'login') {
       this.setState({ showLogin : true });
+    }
+  }
+
+  resetRedirect = () => {
+    this.setState({ redirect : true });
+  }
+
+  refresh = (page) => {
+    console.log("page really is ", page);
+    console.log("redirect really is", this.state.redirect);
+    if (page === 'GetStarted' && this.state.redirect) {
+      this.setState({ redirect : false });
+      console.log("hidy");
+      return <Redirect to="/components/GetStarted" />
     }
   }
 
   render() {
 
-    if (this.state.loading === 'initial') {
-      return <h2>Intializing...</h2>;
-    }
-
-
-    if (this.state.loading === 'true') {
-      return <h2>Loading...</h2>;
-    }
-			 // <Leaderboard DATA_URI={DATA_URI} user={this.state.user} />
     return (
       <div className="wrapper">
         <div>
-      { this.state.showLogin ? <Login DATA_URI={DATA_URI} user={this.state.user} switchForm={this.switchForm} /> 
+      { this.state.showLogin ? <Login DATA_URI={DATA_URI} user={this.state.user} switchForm={this.switchForm} refresh={this.refresh} resetRedirect={this.resetRedirect} /> 
         :
-        <Register DATA_URI={DATA_URI} switchForm={this.switchForm} /> }
+        <Register DATA_URI={DATA_URI} switchForm={this.switchForm} user={this.state.user} resetRedirect={this.resetRedirect} /> }
         </div>
-        <div>
-	   <MainPic DATA_URI={DATA_URI} image={this.state.image} setImage={this.setImage} selectedImage='latest' user={this.state.user} answerToggle={this.state.answerToggle} refresh={this.refresh}/>
-
-        </div>
-        <div>
-      { this.state.image.imageId && <Answers image={this.state.image} DATA_URI={DATA_URI} user={this.state.user} trigger={this.state.trigger} unTriggerAnswers={this.unTriggerAnswers} triggerAnswers={this.triggerAnswers} answerToggle={this.state.answerToggle} />  }
+        <div className="Core-window1">
+          <HashRouter>
+          <div className="Core-window2">
+            <div className="parent">
+              <span>
+     <br />
+      <br />
+      <NavLink exact to="/">Home</NavLink></span>
+              <br />
+              <span><NavLink to="/components/About">About HelpYourselfSolar.  What makes us special.</NavLink></span>
+              <br />
+              <span><NavLink to="/components/GetStarted">{ this.state.user.userId ? <span>My Project</span> : <span>Get Started</span> }</NavLink></span>
+              <br />
+              <span><NavLink to="/components/HowHelpyourself">About How HelpYourselfSolar Works?</NavLink></span>
+              <br />
+              <span><NavLink to="/components/HowSolar">About How Solar Works?</NavLink></span>
+            </div>
+            <div className="content">
+              <Route path="/" exact component={Home}/>
+              <Route path="/components/About" component={About}/>
+              <Route path="/components/GetStarted" render={(props) => <GetStarted {...props} DATA_URI={DATA_URI} user={this.state.user} getStarted={this.state.getStarted} refresh={this.refresh} />} />
+              <Route path="/components/HowSolar" component={HowSolar}/>
+              <Route path="/components/HowHelpyourself" component={HowHelpYourself}/>
+            </div>
+          </div>
+          </HashRouter>
         </div>
       </div>
     );
@@ -97,9 +102,3 @@ class App extends Component {
 }
 
 export default App;
-
-// TODO: resize the images automatically, done, could be done better maybe
-// TODO: you should be able to go to a specific image, even 
-// if it's just for testing/admin
-// TODO: thumbup or down shouldn't show on the leader answers? or you should be able to vote - probably should be able to vote
-// TODO: any user, logged in, should be able to see just their pictures.  If this is going to be used for storage - it might not be able to be free
